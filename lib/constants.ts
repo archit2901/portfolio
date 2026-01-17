@@ -76,6 +76,15 @@ export const EXPERIENCE = [
 
 export const PROJECTS = [
   {
+    title: "CareerCompass AI",
+    description: "Built an AI-powered career development platform using Claude AI that analyzes job descriptions, identifies skill gaps, generates personalized interview questions, and provides learning path recommendations with match score calculations",
+    tech: ["React", "Node.js", "Express", "MongoDB", "Claude AI", "JWT", "Tailwind CSS"],
+    github: "https://github.com/archit2901/careercompass-ai",
+    demo: "",
+    image: "/images/careercompass.png",
+    featured: true,
+  },
+  {
     title: "SmartOffice Workflow Manager",
     description: "Built a React-based web application with 5-tier approval workflow to manage company-wide Return-to-Office policies, improving request handling efficiency by 50% and reducing processing errors",
     tech: ["React", "Node.js", "MongoDB", "REST API"],

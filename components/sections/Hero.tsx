@@ -5,6 +5,7 @@ import { Button } from "../ui/Button";
 import { Github, Linkedin, Mail, Download, ArrowDown } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 const iconMap = {
   Github,
@@ -45,10 +46,28 @@ export function Hero() {
       </div>
 
       <div className="max-w-4xl mx-auto text-center">
+        {/* Profile Photo */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mb-6"
+        >
+          <div className="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto">
+            <Image
+              src="/images/profile.jpg"
+              alt={PERSONAL_INFO.name}
+              fill
+              className="rounded-full object-cover border-4 border-primary/20 shadow-xl"
+              priority
+            />
+          </div>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
             Hi, I'm{" "}

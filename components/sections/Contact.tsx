@@ -8,6 +8,7 @@ import { Mail, Phone } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import type { ContactFormData } from "@/lib/types";
+import emailjs from "@emailjs/browser";
 
 export function Contact() {
   const {
@@ -22,22 +23,34 @@ export function Contact() {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      // EmailJS configuration - set these in your Vercel environment variables
+      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
-      if (response.ok) {
-        setSubmitStatus("success");
-        reset();
-        setTimeout(() => setSubmitStatus(null), 5000);
-      } else {
+      if (!serviceId || !templateId || !publicKey) {
+        console.error("EmailJS configuration missing");
         setSubmitStatus("error");
+        return;
       }
+
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          from_name: data.name,
+          from_email: data.email,
+          message: data.message,
+          to_name: "Archit",
+        },
+        publicKey
+      );
+
+      setSubmitStatus("success");
+      reset();
+      setTimeout(() => setSubmitStatus(null), 5000);
     } catch (error) {
+      console.error("EmailJS error:", error);
       setSubmitStatus("error");
     }
   };

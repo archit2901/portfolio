@@ -44,7 +44,7 @@ export function Footer() {
           {/* Social Links */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Connect</h3>
-            <div className="flex space-x-4">
+            <div className="flex space-x-2">
               {SOCIAL_LINKS.map((social) => {
                 const Icon = iconMap[social.icon as keyof typeof iconMap];
                 return (
@@ -53,7 +53,7 @@ export function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="p-2 rounded-md text-muted-foreground hover:text-primary hover:bg-accent active:bg-accent/80 transition-colors touch-manipulation"
                     aria-label={social.label}
                   >
                     <Icon className="h-5 w-5" />

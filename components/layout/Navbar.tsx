@@ -60,7 +60,7 @@ export function Navbar() {
             <ThemeToggle />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md hover:bg-accent"
+              className="p-2 rounded-md hover:bg-accent active:bg-accent/80 transition-colors touch-manipulation"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
@@ -82,7 +82,7 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                className="block px-3 py-3 rounded-md text-base font-medium hover:bg-accent hover:text-accent-foreground active:bg-accent/80 transition-colors touch-manipulation"
               >
                 {link.label}
               </Link>

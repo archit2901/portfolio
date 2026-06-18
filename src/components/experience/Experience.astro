@@ -1,0 +1,422 @@
+---
+import { site } from '~/content/site';
+
+const { experience } = site;
+
+/**
+ * Per-role accent → Tailwind class mapping. Picking a fixed set lets the JIT
+ * compiler include these classes without inferring from the data file.
+ */
+const ACCENT_BAR: Record<string, string> = {
+  cyan:   'from-cyan-400/0 via-cyan-300/80 to-cyan-400/0',
+  amber:  'from-amber-400/0 via-amber-300/80 to-amber-400/0',
+  rose:   'from-rose-400/0 via-rose-300/80 to-rose-400/0',
+  violet: 'from-violet-400/0 via-fuchsia-300/80 to-violet-400/0',
+};
+const ACCENT_BORDER: Record<string, string> = {
+  cyan:   'hover:border-cyan-400/50 hover:shadow-[0_8px_24px_-14px_rgba(34,211,238,0.45)]',
+  amber:  'hover:border-amber-400/50 hover:shadow-[0_8px_24px_-14px_rgba(251,191,36,0.45)]',
+  rose:   'hover:border-rose-400/50 hover:shadow-[0_8px_24px_-14px_rgba(244,63,94,0.45)]',
+  violet: 'hover:border-violet-400/50 hover:shadow-[0_8px_24px_-14px_rgba(168,85,247,0.45)]',
+};
+const ACCENT_TEXT: Record<string, string> = {
+  cyan:   'text-cyan-300',
+  amber:  'text-amber-300',
+  rose:   'text-rose-300',
+  violet: 'text-violet-300',
+};
+const ACCENT_DOT: Record<string, string> = {
+  cyan:   'bg-cyan-400',
+  amber:  'bg-amber-400',
+  rose:   'bg-rose-400',
+  violet: 'bg-violet-400',
+};
+
+/**
+ * Explicit bento placement by role index. Designed for 4 roles in this order:
+ *   0 — Abacus (current, large feature, top-left)
+ *   1 — NEU Tech Support (small, bottom-left)
+ *   2 — Khoury TA (small, bottom-right)
+ *   3 — EY (large feature, top-right)
+ */
+const ROLE_LAYOUT: string[] = [
+  'md:col-start-1 md:col-span-7 md:row-start-1',
+  'md:col-start-1 md:col-span-6 md:row-start-2',
+  'md:col-start-7 md:col-span-6 md:row-start-2',
+  'md:col-start-8 md:col-span-5 md:row-start-1',
+];
+
+const totalRoles = experience.roles.length;
+const pad2 = (n: number) => String(n).padStart(2, '0');
+---
+
+<section
+  id="experience"
+  data-visible="false"
+  class="experience-section relative isolate overflow-hidden border-t border-border-subtle/40 px-5 sm:px-8 py-16 sm:py-24 md:py-32 mx-auto w-full max-w-container"
+>
+  {/* Atmospheric backdrop */}
+  <div class="exp-grid" aria-hidden="true"></div>
+  <div class="exp-blob" aria-hidden="true"></div>
+
+  {/* Section label */}
+  <p
+    data-reveal="0"
+    class="reveal font-mono text-xs text-text-faint tracking-wider mb-4"
+  >
+    <span class="text-accent/80">{experience.sectionLabel.split('·')[0].trim()}</span>
+    <span class="mx-1.5 text-text-faint/70">·</span>
+    <span>{experience.sectionLabel.split('·')[1]?.trim() ?? 'Experience'}</span>
+  </p>
+
+  {/* Display heading + animated underline */}
+  <h2
+    data-reveal="1"
+    class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
+  >
+    {experience.heading}
+  </h2>
+  <span data-reveal="2" class="reveal exp-underline" aria-hidden="true"></span>
+
+  {/* ── Wins ticker ─────────────────────────────────────────────── */}
+  <div
+    data-reveal="3"
+    class="reveal mt-12 md:mt-14 relative wins-ticker rounded-full border border-border-subtle/70 bg-bg-subtle/50 backdrop-blur-sm overflow-hidden"
+    aria-label="Highlight reel"
+  >
+    <div class="wins-ticker-track flex whitespace-nowrap py-2.5">
+      {[0, 1].map(() => (
+        <ul class="flex items-center shrink-0 list-none p-0 m-0">
+          {experience.winsTicker.map((w) => (
+            <li class="flex items-center px-5 font-mono text-[12.5px] text-text-muted">
+              <span class="text-accent/70 mr-3" aria-hidden="true">▸</span>
+              <span>{w}</span>
+              <span class="ml-5 text-accent/30" aria-hidden="true">·</span>
+            </li>
+          ))}
+        </ul>
+      ))}
+    </div>
+  </div>
+
+  {/* ── Bento of role cards ─────────────────────────────────────── */}
+  <ul class="exp-bento mt-5 md:mt-6 list-none p-0 grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-3 md:gap-4 md:auto-rows-fr">
+    {
+      experience.roles.map((r, i) => {
+        const accent = (r as any).accent ?? 'cyan';
+        const hero = (r as any).heroStat as { value: string; label: string } | undefined;
+        const layout = ROLE_LAYOUT[i] ?? '';
+        return (
+          <li class={`exp-cell ${layout}`} data-reveal={4 + i}>
+            <div class={`exp-card-wrap relative h-full rounded-xl ${r.current ? 'p-px is-current' : ''}`}>
+              <article
+                class={`exp-card relative h-full flex flex-col rounded-xl bg-bg-subtle/55 backdrop-blur-sm border border-border-subtle p-4 md:p-5 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 ${ACCENT_BORDER[accent]} overflow-hidden`}
+                data-magnet
+                data-accent={accent}
+                style="transform: translate(0,0);"
+              >
+                {/* Top accent bar */}
+                <span
+                  class={`pointer-events-none absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${ACCENT_BAR[accent]}`}
+                  aria-hidden="true"
+                ></span>
+
+                {/* Index badge (top-right corner) */}
+                <span
+                  class="absolute top-2.5 right-3 font-mono text-[9px] uppercase tracking-[0.18em] text-text-faint/70 select-none"
+                  aria-hidden="true"
+                >
+                  {pad2(i + 1)} / {pad2(totalRoles)}
+                </span>
+
+                {/* Metric chip */}
+                {hero && (
+                  <div class="inline-flex items-baseline gap-2 self-start mb-3 px-2.5 py-1 rounded-full border border-border-subtle bg-bg-base/40 font-mono text-[11.5px]">
+                    <span class={`${ACCENT_TEXT[accent]}`} aria-hidden="true">▸</span>
+                    <span class="text-text-primary font-medium">{hero.value}</span>
+                    <span class="text-text-faint">{hero.label}</span>
+                  </div>
+                )}
+
+                {/* Header — role + Currently inline */}
+                <header class="flex flex-wrap items-baseline gap-x-2 gap-y-1 pr-12">
+                  <h3 class="text-text-primary text-[15px] md:text-base font-semibold tracking-tight leading-tight">
+                    {r.role}
+                  </h3>
+                  {r.current && (
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-mono text-accent border border-accent/40 bg-accent/[0.06]">
+                      <span class={`block w-1 h-1 rounded-full ${ACCENT_DOT[accent]} wordmark-dot`} aria-hidden="true"></span>
+                      Currently
+                    </span>
+                  )}
+                </header>
+
+                {/* Company · Location */}
+                <p class="mt-1 text-[12.5px] text-text-muted">
+                  {r.url ? (
+                    <a
+                      href={r.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-text-primary hover:text-accent transition-colors"
+                    >
+                      {r.company}
+                    </a>
+                  ) : (
+                    <span class="text-text-primary">{r.company}</span>
+                  )}
+                  <span class="mx-1.5 text-text-faint/70">·</span>
+                  <span>{r.location}</span>
+                </p>
+
+                {/* Dates */}
+                <p class="mt-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-text-faint">
+                  {r.start === r.end ? r.start : `${r.start} — ${r.end}`}
+                </p>
+
+                {/* Separator + bullets (collapsible on mobile) */}
+                {r.bullets.length > 0 && (
+                  <>
+                    <span
+                      class="block border-t border-border-subtle/60 mt-3 mb-3"
+                      aria-hidden="true"
+                    ></span>
+                    <details data-mobile-collapse class="exp-collapse">
+                      <summary class={`exp-collapse-summary md:hidden list-none cursor-pointer inline-flex items-center gap-2 font-mono text-[11.5px] ${ACCENT_TEXT[accent]} hover:brightness-110 transition-[filter] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm`}>
+                        <span class="exp-collapse-label-closed">Show {r.bullets.length} highlights</span>
+                        <span class="exp-collapse-label-open">Hide highlights</span>
+                        <svg
+                          class="exp-chevron transition-transform duration-300"
+                          width="12" height="12" viewBox="0 0 24 24"
+                          fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          aria-hidden="true"
+                          style="display:block"
+                        >
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </summary>
+                      <ul class="exp-collapse-content space-y-1.5 list-none p-0 md:mt-0 mt-3">
+                        {r.bullets.map((b) => (
+                          <li class="flex gap-2 text-[13px] text-text-muted leading-snug">
+                            <span class={`select-none mt-0.5 shrink-0 ${ACCENT_TEXT[accent]}`} aria-hidden="true">▸</span>
+                            <span>{b}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  </>
+                )}
+
+              </article>
+            </div>
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>
+
+<style>
+  /* ── Conic-gradient angle property for current-role border ───── */
+  @property --exp-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+
+  /* ── Atmospheric backdrop ─────────────────────────────────────── */
+  .exp-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.10) 1px, transparent 0);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 80% 70% at 30% 60%, #000 25%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 30% 60%, #000 25%, transparent 80%);
+  }
+  .exp-blob {
+    position: absolute;
+    z-index: -1;
+    bottom: -120px;
+    left: -120px;
+    width: 540px;
+    height: 540px;
+    border-radius: 9999px;
+    background: conic-gradient(from 30deg, rgba(34,211,238,0.18), rgba(168,85,247,0.18), rgba(251,191,36,0.12), rgba(34,211,238,0.18));
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ── Animated heading underline ──────────────────────────────── */
+  .exp-underline {
+    display: block;
+    margin-top: 18px;
+    height: 2px;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #22d3ee, #a855f7);
+    transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;
+    will-change: width;
+  }
+  .experience-section[data-visible='true'] .exp-underline { width: 120px; }
+
+  /* ── Scroll-in reveal sequence ───────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .experience-section[data-visible='true'] .reveal { opacity: 1; transform: translateY(0); }
+  .experience-section[data-visible='true'] .reveal[data-reveal='0'] { transition-delay:   0ms; }
+  .experience-section[data-visible='true'] .reveal[data-reveal='1'] { transition-delay:  90ms; }
+  .experience-section[data-visible='true'] .reveal[data-reveal='2'] { transition-delay: 160ms; }
+  .experience-section[data-visible='true'] .reveal[data-reveal='3'] { transition-delay: 240ms; }
+  .experience-section[data-visible='true'] .reveal[data-reveal='4'] { transition-delay: 340ms; }
+  .experience-section[data-visible='true'] .reveal[data-reveal='5'] { transition-delay: 420ms; }
+  .experience-section[data-visible='true'] .reveal[data-reveal='6'] { transition-delay: 500ms; }
+  .experience-section[data-visible='true'] .reveal[data-reveal='7'] { transition-delay: 580ms; }
+
+  /* ── Wins ticker ──────────────────────────────────────────────── */
+  .wins-ticker {
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+  .wins-ticker-track {
+    width: max-content;
+    animation: ticker-scroll 42s linear infinite;
+  }
+  .wins-ticker:hover .wins-ticker-track,
+  .wins-ticker:focus-within .wins-ticker-track {
+    animation-play-state: paused;
+  }
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ── Current-role rotating conic border ──────────────────────── */
+  .exp-card-wrap.is-current {
+    background: conic-gradient(
+      from var(--exp-angle),
+      rgba(34, 211, 238, 0.85),
+      rgba(168, 85, 247, 0.7),
+      rgba(34, 211, 238, 0.85)
+    );
+    animation: exp-angle-rot 7s linear infinite;
+  }
+  @keyframes exp-angle-rot { to { --exp-angle: 360deg; } }
+
+  /* ── Breathing dot ────────────────────────────────────────────── */
+  .wordmark-dot {
+    animation: dot-breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes dot-breathe {
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50%      { opacity: 1;    transform: scale(1.15); }
+  }
+
+  /* ── Mobile-only collapse for per-card bullets ──────────────── */
+  .exp-collapse-summary { list-style: none; }
+  .exp-collapse-summary::-webkit-details-marker { display: none; }
+  .exp-collapse[open] .exp-chevron { transform: rotate(180deg); }
+  .exp-collapse-label-open { display: none; }
+  .exp-collapse[open] .exp-collapse-label-closed { display: none; }
+  .exp-collapse[open] .exp-collapse-label-open { display: inline; }
+  @media (min-width: 768px) {
+    .exp-collapse > .exp-collapse-content { display: block !important; }
+  }
+
+  /* ── Reduced motion gates ────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .exp-underline { width: 120px; transition: none; }
+    .wins-ticker-track { animation: none; transform: none; flex-wrap: wrap; white-space: normal; }
+    .wins-ticker { mask-image: none; -webkit-mask-image: none; }
+    .exp-card-wrap.is-current { animation: none !important; }
+    .wordmark-dot { animation: none; opacity: 1; transform: none; }
+    .exp-chevron { transition: none; }
+  }
+</style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('section#experience.experience-section');
+  if (section) {
+    // ── Section reveal toggle ────────────────────────────────────────
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).dataset.visible = 'true';
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -15% 0px', threshold: 0.1 }
+    );
+    io.observe(section);
+
+    // ── Mobile-only collapse: keep <details> open on md+ ──────────
+    const collapses = section.querySelectorAll<HTMLDetailsElement>('[data-mobile-collapse]');
+    const collapseMq = matchMedia('(min-width: 768px)');
+    const applyCollapse = () => {
+      const desktop = collapseMq.matches;
+      collapses.forEach((d) => {
+        if (desktop) d.open = true;
+        else if (!d.dataset.touched) d.open = false;
+      });
+    };
+    collapses.forEach((d) => {
+      d.addEventListener('toggle', () => {
+        if (!collapseMq.matches) d.dataset.touched = 'true';
+      });
+    });
+    applyCollapse();
+    collapseMq.addEventListener('change', () => {
+      collapses.forEach((d) => delete d.dataset.touched);
+      applyCollapse();
+    });
+
+    // ── Scroll parallax on backdrop (grid + blob, opposing) ────────
+    const grid = section.querySelector<HTMLElement>('.exp-grid');
+    const blob = section.querySelector<HTMLElement>('.exp-blob');
+    const parallaxOk = matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    if ((grid || blob) && parallaxOk) {
+      let parallaxRaf = 0;
+      const onParallax = () => {
+        cancelAnimationFrame(parallaxRaf);
+        parallaxRaf = requestAnimationFrame(() => {
+          const rect = section.getBoundingClientRect();
+          const vh = window.innerHeight || 1;
+          const progress = (vh - rect.top) / (vh + rect.height);
+          const clamped = Math.max(-0.5, Math.min(1.5, progress));
+          if (grid) grid.style.transform = `translateY(${(-clamped * 40).toFixed(1)}px)`;
+          if (blob) blob.style.transform = `translateY(${(clamped * 25).toFixed(1)}px)`;
+        });
+      };
+      window.addEventListener('scroll', onParallax, { passive: true });
+      onParallax();
+    }
+
+    // ── Magnetic micro-tilt on cards ─────────────────────────────────
+    const MAG_STRENGTH = 0.06;
+    const MAG_MAX = 3;
+    section.querySelectorAll<HTMLElement>('[data-magnet]').forEach((card) => {
+      card.addEventListener('pointermove', (e) => {
+        if ((e as PointerEvent).pointerType !== 'mouse') return;
+        const rect = card.getBoundingClientRect();
+        const dx = (e.clientX - (rect.left + rect.width / 2)) * MAG_STRENGTH;
+        const dy = (e.clientY - (rect.top + rect.height / 2)) * MAG_STRENGTH;
+        const cx = Math.max(-MAG_MAX, Math.min(MAG_MAX, dx));
+        const cy = Math.max(-MAG_MAX, Math.min(MAG_MAX, dy));
+        card.style.transform = `translate(${cx}px, ${cy}px)`;
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.transform = 'translate(0, 0)';
+      });
+    });
+  }
+</script>

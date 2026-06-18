@@ -1,0 +1,285 @@
+---
+import { site } from '~/content/site';
+
+const { hero } = site;
+
+// Pass the structured session to the inline script via a data attribute.
+const terminalJson = JSON.stringify(hero.terminalSession);
+---
+
+<section
+  id="hero"
+  class="relative isolate overflow-hidden min-h-[calc(100vh-4rem)] flex items-center"
+>
+  {/* ── Backdrop layers (order: back → front) ─────────────────────── */}
+  {/* Subtle grid background — visible even before Three.js loads */}
+  <div class="absolute inset-0 -z-30 hero-grid-bg" aria-hidden="true"></div>
+  {/* Soft radial vignette for contrast behind the text */}
+  <div
+    class="absolute inset-0 -z-20"
+    aria-hidden="true"
+    style="background: radial-gradient(800px 500px at 25% 50%, rgba(10,10,10,0.75), transparent 65%);"
+  ></div>
+  {/* Three.js canvas — pinned to the right half on desktop */}
+  <canvas
+    id="hero-canvas"
+    class="absolute inset-0 -z-10 w-full h-full md:left-auto md:right-0 md:w-[62%] opacity-90 pointer-events-none"
+    aria-hidden="true"
+  ></canvas>
+
+  {/* ── Content ──────────────────────────────────────────────────── */}
+  <div class="mx-auto w-full max-w-container px-5 sm:px-8 py-14 sm:py-20 md:py-28">
+    <div class="max-w-2xl">
+      <p
+        class="font-mono text-sm text-accent/90 mb-4 motion-safe:animate-fade-up"
+        style="animation-delay: 60ms;"
+      >
+        <span class="text-text-faint">&gt;</span> {hero.eyebrow}
+      </p>
+
+      <h1
+        class="font-sans font-semibold tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] motion-safe:animate-fade-up"
+        style="animation-delay: 140ms;"
+      >
+        <span class="text-text-primary">{hero.name}</span>
+      </h1>
+
+      <h2
+        class="mt-3 font-sans font-medium tracking-tight text-2xl sm:text-3xl md:text-4xl text-gradient-accent motion-safe:animate-fade-up"
+        style="animation-delay: 220ms;"
+      >
+        {hero.title}
+      </h2>
+
+      <p
+        class="mt-6 max-w-xl text-text-muted text-base sm:text-lg leading-relaxed motion-safe:animate-fade-up"
+        style="animation-delay: 320ms;"
+      >
+        {hero.tagline}
+      </p>
+
+      {/* CTAs */}
+      <div
+        class="mt-8 flex flex-col xs:flex-row sm:flex-row flex-wrap items-stretch sm:items-center gap-3 motion-safe:animate-fade-up"
+        style="animation-delay: 420ms;"
+      >
+        {
+          hero.ctas.map((cta) => {
+            const base =
+              'inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-colors';
+            const styles =
+              cta.variant === 'primary'
+                ? 'bg-accent text-bg-base hover:bg-accent-warm'
+                : 'border border-border-strong text-text-primary hover:bg-bg-raised hover:border-accent/50';
+            return (
+              <a href={cta.href} class={`${base} ${styles} w-full sm:w-auto`}>
+                <span>{cta.label}</span>
+                {cta.variant === 'primary' && <span aria-hidden="true">→</span>}
+              </a>
+            );
+          })
+        }
+      </div>
+
+      {/* Socials */}
+      <ul
+        class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-mono text-text-muted list-none p-0 motion-safe:animate-fade-up"
+        style="animation-delay: 520ms;"
+      >
+        {
+          hero.socials.map((s, i) => (
+            <li class="flex items-center gap-x-5">
+              {i > 0 && <span class="text-text-faint" aria-hidden="true">·</span>}
+              <a
+                href={s.href}
+                target={s.href.startsWith('http') ? '_blank' : undefined}
+                rel={s.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                class="hover:text-accent transition-colors"
+              >
+                {s.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      {/* Live shell session — typewriter effect, motion-safe */}
+      <div
+        id="hero-terminal"
+        data-session={terminalJson}
+        class="hidden md:block mt-10 w-full max-w-md p-3.5 rounded-md border border-border-subtle bg-bg-subtle/60 backdrop-blur-sm font-mono text-[12px] leading-[1.6] text-text-muted motion-safe:animate-fade-in overflow-hidden"
+        style="animation-delay: 700ms;"
+        aria-hidden="true"
+      >
+        {/* Compact macOS-style window dots */}
+        <div class="flex items-center gap-1 mb-2.5" aria-hidden="true">
+          <span class="block w-2 h-2 rounded-full bg-traffic-red/80"></span>
+          <span class="block w-2 h-2 rounded-full bg-traffic-yellow/80"></span>
+          <span class="block w-2 h-2 rounded-full bg-traffic-green/80"></span>
+        </div>
+        <div id="hero-terminal-output" class="break-words"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initHeroScene } from './heroScene';
+
+  // ── Hero terminal typewriter ──────────────────────────────────────
+  type SessionStep = { cmd: string; out: string | string[] };
+  const termRoot = document.getElementById('hero-terminal');
+  const termOutput = document.getElementById('hero-terminal-output');
+
+  const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+  const escapeHtml = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  /** Returns a `<div>` with the prompt followed by an empty `<span>` for typing,
+   * and a blinking-cursor `<span>` after it (initially hidden). */
+  const buildCmdLine = (doc: Document) => {
+    const line = doc.createElement('div');
+    line.innerHTML =
+      '<span class="text-accent">archit</span>' +
+      '<span class="text-text-faint"> @ </span>' +
+      '<span class="text-text-primary">portfolio</span>' +
+      '<span class="text-text-faint">:~$ </span>';
+    const typed = doc.createElement('span');
+    typed.className = 'text-text-primary';
+    line.appendChild(typed);
+    const cursor = doc.createElement('span');
+    cursor.className = 'term-cursor';
+    cursor.textContent = '█';
+    line.appendChild(cursor);
+    return { line, typed, cursor };
+  };
+
+  if (termRoot && termOutput) {
+    const sessionAttr = termRoot.getAttribute('data-session') ?? '[]';
+    let session: SessionStep[] = [];
+    try { session = JSON.parse(sessionAttr); } catch (_) { session = []; }
+
+    const reduceMotion =
+      matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      document.documentElement.getAttribute('data-reduce-motion') === 'true';
+
+    const renderInstant = () => {
+      const promptHtml =
+        '<span class="text-accent">archit</span>' +
+        '<span class="text-text-faint"> @ </span>' +
+        '<span class="text-text-primary">portfolio</span>' +
+        '<span class="text-text-faint">:~$ </span>';
+      const parts: string[] = [];
+      for (const step of session) {
+        parts.push(`<div>${promptHtml}<span class="text-text-primary">${escapeHtml(step.cmd)}</span></div>`);
+        const outs = Array.isArray(step.out) ? step.out : [step.out];
+        for (const line of outs) {
+          parts.push(`<div class="text-text-muted">${escapeHtml(line)}</div>`);
+        }
+      }
+      // Trailing prompt with a blinking cursor
+      parts.push(`<div>${promptHtml}<span class="term-cursor">█</span></div>`);
+      termOutput.innerHTML = parts.join('');
+    };
+
+    if (reduceMotion) {
+      renderInstant();
+    } else {
+      const start = () => {
+        (async () => {
+          for (const step of session) {
+            const { line, typed, cursor } = buildCmdLine(document);
+            termOutput.appendChild(line);
+
+            // Type the command. Cursor sits at end of `typed` because it's the
+            // next sibling — naturally inline-trailing.
+            for (const ch of step.cmd) {
+              typed.append(ch);
+              await sleep(26 + Math.random() * 20);
+            }
+            await sleep(200);
+
+            // Detach cursor while output prints, then re-attach to next prompt.
+            cursor.remove();
+
+            const outs = Array.isArray(step.out) ? step.out : [step.out];
+            for (const outLine of outs) {
+              const outDiv = document.createElement('div');
+              outDiv.className = 'text-text-muted';
+              outDiv.textContent = outLine;
+              termOutput.appendChild(outDiv);
+              await sleep(95);
+            }
+            await sleep(260);
+          }
+          // After the session ends, drop a final empty prompt with the cursor.
+          const { line: trailing } = buildCmdLine(document);
+          termOutput.appendChild(trailing);
+        })();
+      };
+
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(start, { timeout: 400 });
+      } else {
+        setTimeout(start, 250);
+      }
+    }
+  }
+
+  const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement | null;
+  if (canvas) {
+    const supportsWebGL = (() => {
+      try {
+        const gl =
+          canvas.getContext('webgl2') ||
+          canvas.getContext('webgl') ||
+          canvas.getContext('experimental-webgl');
+        return !!gl;
+      } catch {
+        return false;
+      }
+    })();
+
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (supportsWebGL && !reduceMotion) {
+      let cleanup: (() => void) | null = null;
+
+      const start = () => {
+        if (cleanup) return;
+        cleanup = initHeroScene(canvas);
+      };
+
+      // Hero is above-the-fold, so just kick it off after a tick to keep
+      // first-paint snappy.
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(start, { timeout: 200 });
+      } else {
+        setTimeout(start, 0);
+      }
+
+      // Tear down on Astro view transitions (no-op for non-SPA nav).
+      document.addEventListener('astro:before-swap', () => {
+        cleanup?.();
+        cleanup = null;
+      });
+    }
+  }
+</script>
+
+<style is:global>
+  /* Inline blinking caret for the typewriter terminal. */
+  .term-cursor {
+    display: inline-block;
+    margin-left: 1px;
+    color: #22d3ee;
+    animation: term-blink 1.05s steps(2, end) infinite;
+  }
+  @keyframes term-blink {
+    0%, 49%   { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .term-cursor { animation: none; opacity: 1; }
+  }
+</style>

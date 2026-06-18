@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#0e1a22"/>
+      <stop offset="55%"  stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#161025"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="32%" cy="22%" r="55%">
+      <stop offset="0%"   stop-color="#22d3ee" stop-opacity="0.55"/>
+      <stop offset="55%"  stop-color="#22d3ee" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo2" cx="78%" cy="82%" r="55%">
+      <stop offset="0%"   stop-color="#a855f7" stop-opacity="0.45"/>
+      <stop offset="55%"  stop-color="#a855f7" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#22d3ee" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="480" height="600" fill="url(#bg)"/>
+  <rect width="480" height="600" fill="url(#grid)"/>
+  <rect width="480" height="600" fill="url(#halo)"/>
+  <rect width="480" height="600" fill="url(#halo2)"/>
+
+  <!-- Decorative network nodes echoing the hero globe -->
+  <g fill="#22d3ee" fill-opacity="0.55">
+    <circle cx="90"  cy="120" r="2"/>
+    <circle cx="160" cy="80"  r="1.5"/>
+    <circle cx="380" cy="160" r="2"/>
+    <circle cx="420" cy="260" r="1.5"/>
+    <circle cx="80"  cy="340" r="2"/>
+    <circle cx="200" cy="500" r="1.5"/>
+    <circle cx="360" cy="480" r="2"/>
+  </g>
+  <g stroke="#22d3ee" stroke-opacity="0.18" stroke-width="1" fill="none">
+    <path d="M90 120 Q 220 60 380 160" />
+    <path d="M380 160 Q 420 220 420 260" />
+    <path d="M80 340 Q 200 400 360 480" />
+  </g>
+
+  <!-- Monogram -->
+  <g transform="translate(240 320)">
+    <circle r="92" fill="#0a0a0a" stroke="#22d3ee" stroke-opacity="0.45" stroke-width="1.5"/>
+    <text x="0" y="22" text-anchor="middle"
+          font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+          font-weight="600" font-size="84" fill="#ededed">A</text>
+  </g>
+
+  <text x="240" y="555" text-anchor="middle"
+        font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+        font-size="11" fill="#9ca3af" fill-opacity="0.7" letter-spacing="2">
+    PORTRAIT — REPLACE ME
+  </text>
+</svg>

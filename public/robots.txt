@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://architgupta.me/sitemap-index.xml

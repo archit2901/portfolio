@@ -1,0 +1,391 @@
+---
+import { site } from '~/content/site';
+
+const { contact } = site;
+
+const ACCENT_BORDER: Record<string, string> = {
+  cyan:   'hover:border-cyan-400/50 hover:shadow-[0_8px_24px_-14px_rgba(34,211,238,0.45)]',
+  amber:  'hover:border-amber-400/50 hover:shadow-[0_8px_24px_-14px_rgba(251,191,36,0.45)]',
+  rose:   'hover:border-rose-400/50 hover:shadow-[0_8px_24px_-14px_rgba(244,63,94,0.45)]',
+  violet: 'hover:border-violet-400/50 hover:shadow-[0_8px_24px_-14px_rgba(168,85,247,0.45)]',
+};
+const ACCENT_ICON: Record<string, string> = {
+  cyan:   'text-cyan-300',
+  amber:  'text-amber-300',
+  rose:   'text-rose-300',
+  violet: 'text-violet-300',
+};
+const ACCENT_DOT: Record<string, string> = {
+  cyan:   'bg-cyan-400',
+  amber:  'bg-amber-400',
+  rose:   'bg-rose-400',
+  violet: 'bg-violet-400',
+};
+const ACCENT_SPOT: Record<string, string> = {
+  cyan:   'rgba(34, 211, 238, 0.20)',
+  amber:  'rgba(251, 191, 36, 0.18)',
+  rose:   'rgba(244, 63, 94, 0.18)',
+  violet: 'rgba(168, 85, 247, 0.20)',
+};
+const ACCENT_LABEL: Record<string, string> = {
+  cyan:   'group-hover:text-cyan-300',
+  amber:  'group-hover:text-amber-300',
+  rose:   'group-hover:text-rose-300',
+  violet: 'group-hover:text-violet-300',
+};
+
+/** Action verb shown under each tile label. */
+const ACTION_VERB: Record<string, string> = {
+  open:     '↗ open',
+  compose:  '↗ compose',
+  download: '↓ pdf',
+};
+---
+
+<section
+  id="contact"
+  data-visible="false"
+  class="contact-section relative isolate overflow-hidden border-t border-border-subtle/40 px-5 sm:px-8 py-16 sm:py-24 md:py-32 mx-auto w-full max-w-container"
+>
+  {/* Atmospheric backdrop */}
+  <div class="ct-grid" aria-hidden="true"></div>
+  <div class="ct-blob" aria-hidden="true"></div>
+
+  {/* Section label */}
+  <p
+    data-reveal="0"
+    class="reveal font-mono text-xs text-text-faint tracking-wider mb-4"
+  >
+    <span class="text-accent/80">{contact.sectionLabel.split('·')[0].trim()}</span>
+    <span class="mx-1.5 text-text-faint/70">·</span>
+    <span>{contact.sectionLabel.split('·')[1]?.trim() ?? 'Contact'}</span>
+  </p>
+
+  {/* Display heading + underline */}
+  <h2
+    data-reveal="1"
+    class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
+  >
+    {contact.heading}
+  </h2>
+  <span data-reveal="2" class="reveal ct-underline" aria-hidden="true"></span>
+
+  {/* Lead line */}
+  <p
+    data-reveal="3"
+    class="reveal mt-8 text-text-muted text-[15px] md:text-base leading-relaxed max-w-[58ch]"
+  >
+    {contact.lead}
+  </p>
+
+  {/* Big email card */}
+  <div data-reveal="4" class="reveal mt-8 md:mt-10">
+    <div
+      id="ct-email-card"
+      class="ct-email-card relative rounded-xl bg-bg-subtle/55 backdrop-blur-sm border border-border-subtle hover:border-accent/50 transition-[border-color,box-shadow] duration-300 hover:shadow-[0_8px_24px_-14px_rgba(34,211,238,0.45)] overflow-hidden p-5 md:p-6"
+    >
+      {/* Cursor-tracking spotlight */}
+      <span class="ct-spotlight" style="--ct-color: rgba(34, 211, 238, 0.18)" aria-hidden="true"></span>
+
+      <div class="relative flex items-center gap-3 flex-wrap">
+        <span class="block w-2 h-2 rounded-full bg-accent wordmark-dot shrink-0" aria-hidden="true"></span>
+        <a
+          href={`mailto:${contact.email}`}
+          aria-label={`Email ${contact.email}`}
+          class="font-mono text-[15px] sm:text-lg md:text-xl text-text-primary hover:text-accent transition-colors break-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
+        >
+          {contact.email}
+        </a>
+        <button
+          id="ct-copy-btn"
+          type="button"
+          data-copy-value={contact.email}
+          aria-label="Copy email to clipboard"
+          class="ml-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-mono text-[11.5px] text-text-muted border border-border-subtle bg-bg-base/40 hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+        >
+          <svg class="ct-copy-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <svg class="ct-copy-check hidden" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span class="ct-copy-label">copy</span>
+        </button>
+      </div>
+
+      {/* Terminal prompt rhyme */}
+      <p class="relative mt-5 font-mono text-[12px] text-text-faint">
+        <span class="text-accent">archit</span><span class="text-text-faint"> @ </span><span class="text-text-primary">portfolio</span><span class="text-text-faint">:~$ </span><span class="term-cursor">█</span>
+      </p>
+    </div>
+  </div>
+
+  {/* Link tiles */}
+  <ul
+    data-reveal="5"
+    class="reveal mt-3 md:mt-4 list-none p-0 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"
+  >
+    {
+      contact.links.map((link) => {
+        const accent = link.accent;
+        const isExternal = link.href.startsWith('http');
+        return (
+          <li>
+            <a
+              href={link.href}
+              target={isExternal ? '_blank' : undefined}
+              rel={isExternal ? 'noopener noreferrer' : undefined}
+              download={link.action === 'download' ? '' : undefined}
+              aria-label={link.label}
+              class={`group ct-tile relative block rounded-xl bg-bg-subtle/55 backdrop-blur-sm border border-border-subtle p-4 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 ${ACCENT_BORDER[accent]} overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base`}
+              data-accent={accent}
+              style={`--ct-color: ${ACCENT_SPOT[accent]}`}
+            >
+              <span class="ct-spotlight" aria-hidden="true"></span>
+
+              <div class="relative flex flex-col gap-2.5">
+                <span class={`${ACCENT_ICON[accent]}`} aria-hidden="true">
+                  {link.icon === 'github' && (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:block">
+                      <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.29-1.69-1.29-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.97.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.05.78 2.12v3.14c0 .31.21.67.8.56C20.21 21.38 23.5 17.07 23.5 12 23.5 5.65 18.35.5 12 .5z"/>
+                    </svg>
+                  )}
+                  {link.icon === 'linkedin' && (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:block">
+                      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.95v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.23 0z"/>
+                    </svg>
+                  )}
+                  {link.icon === 'mail' && (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block">
+                      <rect x="3" y="5" width="18" height="14" rx="2"/>
+                      <path d="m3 7 9 6 9-6"/>
+                    </svg>
+                  )}
+                  {link.icon === 'download' && (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block">
+                      <path d="M12 3v12"/>
+                      <path d="M7 10l5 5 5-5"/>
+                      <path d="M5 21h14"/>
+                    </svg>
+                  )}
+                </span>
+                <span class={`text-[14px] text-text-primary font-medium transition-colors ${ACCENT_LABEL[accent]}`}>
+                  {link.label}
+                </span>
+                <span class="font-mono text-[10.5px] text-text-faint tracking-wider">
+                  {ACTION_VERB[link.action] ?? '↗ open'}
+                </span>
+              </div>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+
+  {/* Status strip */}
+  <ul
+    data-reveal="6"
+    class="reveal mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 list-none p-0 font-mono text-[12px] text-text-faint"
+  >
+    {
+      contact.status.map((s, i) => (
+        <li class="inline-flex items-center gap-2">
+          {i > 0 && <span class="text-text-faint/60 mr-2" aria-hidden="true">·</span>}
+          {s.icon === 'dot' && (
+            <span class={`block w-1.5 h-1.5 rounded-full ${ACCENT_DOT.cyan} ${i === 0 ? 'wordmark-dot' : ''}`} aria-hidden="true"></span>
+          )}
+          {s.icon === 'mail' && (
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
+              <rect x="3" y="5" width="18" height="14" rx="2"/>
+              <path d="m3 7 9 6 9-6"/>
+            </svg>
+          )}
+          {s.icon === 'clock' && (
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          )}
+          <span>{s.label}</span>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style is:global>
+  /* ── Atmospheric backdrop (top-center blob — fresh corner) ──── */
+  .ct-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.10) 1px, transparent 0);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 25%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 25%, transparent 80%);
+  }
+  .ct-blob {
+    position: absolute;
+    z-index: -1;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 640px;
+    height: 460px;
+    border-radius: 9999px;
+    background: conic-gradient(from 180deg, rgba(34,211,238,0.20), rgba(168,85,247,0.18), rgba(34,211,238,0.20));
+    filter: blur(70px);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  /* Heading underline */
+  .ct-underline {
+    display: block;
+    margin-top: 18px;
+    height: 2px;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #22d3ee, #a855f7);
+    transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;
+    will-change: width;
+  }
+  .contact-section[data-visible='true'] .ct-underline { width: 120px; }
+
+  /* Reveal cascade */
+  .contact-section .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .contact-section[data-visible='true'] .reveal { opacity: 1; transform: translateY(0); }
+  .contact-section[data-visible='true'] .reveal[data-reveal='0'] { transition-delay:   0ms; }
+  .contact-section[data-visible='true'] .reveal[data-reveal='1'] { transition-delay:  90ms; }
+  .contact-section[data-visible='true'] .reveal[data-reveal='2'] { transition-delay: 160ms; }
+  .contact-section[data-visible='true'] .reveal[data-reveal='3'] { transition-delay: 240ms; }
+  .contact-section[data-visible='true'] .reveal[data-reveal='4'] { transition-delay: 340ms; }
+  .contact-section[data-visible='true'] .reveal[data-reveal='5'] { transition-delay: 440ms; }
+  .contact-section[data-visible='true'] .reveal[data-reveal='6'] { transition-delay: 540ms; }
+
+  /* Cursor-tracking spotlight (reused pattern from Projects/Skills) */
+  .ct-spotlight {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 220ms ease;
+    background: radial-gradient(
+      300px circle at var(--ct-mx, 50%) var(--ct-my, 50%),
+      var(--ct-color, rgba(34, 211, 238, 0.18)),
+      transparent 50%
+    );
+  }
+  .ct-email-card:hover .ct-spotlight,
+  .ct-tile:hover .ct-spotlight,
+  .ct-email-card:focus-within .ct-spotlight,
+  .ct-tile:focus-within .ct-spotlight { opacity: 1; }
+
+  /* Copy-button success state */
+  #ct-copy-btn.is-copied {
+    color: #67e8f9;
+    border-color: rgba(34, 211, 238, 0.5);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .contact-section .reveal { opacity: 1; transform: none; transition: none; }
+    .ct-underline { width: 120px; transition: none; }
+    .ct-spotlight { display: none; }
+    .ct-grid, .ct-blob { transform: none !important; }
+  }
+</style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('section#contact.contact-section');
+  if (section) {
+    // Section reveal
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).dataset.visible = 'true';
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -15% 0px', threshold: 0.1 }
+    );
+    io.observe(section);
+
+    // Cursor-tracking spotlight (email card + each tile)
+    const spotlightTargets = section.querySelectorAll<HTMLElement>('.ct-email-card, .ct-tile');
+    spotlightTargets.forEach((el) => {
+      el.addEventListener('pointermove', (e) => {
+        if ((e as PointerEvent).pointerType !== 'mouse') return;
+        const rect = el.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width;
+        const py = (e.clientY - rect.top) / rect.height;
+        el.style.setProperty('--ct-mx', `${(px * 100).toFixed(1)}%`);
+        el.style.setProperty('--ct-my', `${(py * 100).toFixed(1)}%`);
+      });
+    });
+
+    // Copy-to-clipboard
+    const copyBtn = section.querySelector<HTMLButtonElement>('#ct-copy-btn');
+    if (copyBtn) {
+      const iconCopy  = copyBtn.querySelector<SVGElement>('.ct-copy-icon');
+      const iconCheck = copyBtn.querySelector<SVGElement>('.ct-copy-check');
+      const label     = copyBtn.querySelector<HTMLSpanElement>('.ct-copy-label');
+      let revertTimer = 0;
+
+      const showCopied = () => {
+        copyBtn.classList.add('is-copied');
+        iconCopy?.classList.add('hidden');
+        iconCheck?.classList.remove('hidden');
+        if (label) label.textContent = 'copied';
+        clearTimeout(revertTimer);
+        revertTimer = window.setTimeout(() => {
+          copyBtn.classList.remove('is-copied');
+          iconCopy?.classList.remove('hidden');
+          iconCheck?.classList.add('hidden');
+          if (label) label.textContent = 'copy';
+        }, 1600);
+      };
+
+      const fallbackCopy = (text: string) => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        // Legacy fallback for insecure contexts where navigator.clipboard is unavailable.
+        try {
+          // @ts-ignore — execCommand is deprecated but still works as a fallback
+          document.execCommand('copy');
+        } catch {}
+        ta.remove();
+      };
+
+      copyBtn.addEventListener('click', async () => {
+        const value = copyBtn.getAttribute('data-copy-value') ?? '';
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(value);
+          } else {
+            fallbackCopy(value);
+          }
+          showCopied();
+        } catch {
+          fallbackCopy(value);
+          showCopied();
+        }
+      });
+    }
+  }
+</script>

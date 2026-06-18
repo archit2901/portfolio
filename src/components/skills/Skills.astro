@@ -1,0 +1,473 @@
+---
+import { site } from '~/content/site';
+
+const { skills } = site;
+
+/** Per-category accent → Tailwind class mapping (matches Experience/Education). */
+const ACCENT_BAR: Record<string, string> = {
+  cyan:   'from-cyan-400/0 via-cyan-300/80 to-cyan-400/0',
+  amber:  'from-amber-400/0 via-amber-300/80 to-amber-400/0',
+  rose:   'from-rose-400/0 via-rose-300/80 to-rose-400/0',
+  violet: 'from-violet-400/0 via-fuchsia-300/80 to-violet-400/0',
+};
+const ACCENT_BORDER: Record<string, string> = {
+  cyan:   'hover:border-cyan-400/50 hover:shadow-[0_8px_24px_-14px_rgba(34,211,238,0.45)]',
+  amber:  'hover:border-amber-400/50 hover:shadow-[0_8px_24px_-14px_rgba(251,191,36,0.45)]',
+  rose:   'hover:border-rose-400/50 hover:shadow-[0_8px_24px_-14px_rgba(244,63,94,0.45)]',
+  violet: 'hover:border-violet-400/50 hover:shadow-[0_8px_24px_-14px_rgba(168,85,247,0.45)]',
+};
+const ACCENT_DOT: Record<string, string> = {
+  cyan:   'bg-cyan-400',
+  amber:  'bg-amber-400',
+  rose:   'bg-rose-400',
+  violet: 'bg-violet-400',
+};
+const ACCENT_PILL_HOVER: Record<string, string> = {
+  cyan:   'hover:text-cyan-300 hover:border-cyan-400/40 hover:bg-cyan-400/[0.06]',
+  amber:  'hover:text-amber-300 hover:border-amber-400/40 hover:bg-amber-400/[0.06]',
+  rose:   'hover:text-rose-300 hover:border-rose-400/40 hover:bg-rose-400/[0.06]',
+  violet: 'hover:text-violet-300 hover:border-violet-400/40 hover:bg-violet-400/[0.06]',
+};
+
+const totalCats = skills.categories.length;
+const pad2 = (n: number) => String(n).padStart(2, '0');
+---
+
+<section
+  id="skills"
+  data-visible="false"
+  class="skills-section relative isolate overflow-hidden border-t border-border-subtle/40 px-5 sm:px-8 py-16 sm:py-24 md:py-32 mx-auto w-full max-w-container"
+>
+  {/* Atmospheric backdrop — distinct corner from neighbors */}
+  <div class="sk-grid" aria-hidden="true"></div>
+  <div class="sk-blob" aria-hidden="true"></div>
+
+  {/* Section label */}
+  <p
+    data-reveal="0"
+    class="reveal font-mono text-xs text-text-faint tracking-wider mb-4"
+  >
+    <span class="text-accent/80">{skills.sectionLabel.split('·')[0].trim()}</span>
+    <span class="mx-1.5 text-text-faint/70">·</span>
+    <span>{skills.sectionLabel.split('·')[1]?.trim() ?? 'Skills'}</span>
+  </p>
+
+  {/* Display heading + animated underline */}
+  <h2
+    data-reveal="1"
+    class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
+  >
+    {skills.heading}
+  </h2>
+  <span data-reveal="2" class="reveal sk-underline" aria-hidden="true"></span>
+
+  {/* ── Primary stack strip ────────────────────────────────────── */}
+  <div data-reveal="3" class="reveal mt-12 md:mt-14">
+    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint mb-3">
+      Primary stack
+    </p>
+    <ul class="flex flex-wrap gap-2 list-none p-0">
+      {
+        skills.primaryStack.map((s) => (
+          <li>
+            <span class="primary-pill inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full font-mono text-[13px] text-text-primary border border-accent/30 bg-accent/[0.05] hover:bg-accent/[0.1] hover:border-accent/60 transition-colors">
+              <span class="block w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+              <span>{s}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  {/* ── Filter chips ───────────────────────────────────────────── */}
+  <div
+    data-reveal="4"
+    class="reveal mt-10 flex flex-wrap items-center gap-2"
+    role="tablist"
+    aria-label="Filter skills by category"
+  >
+    <button
+      type="button"
+      data-filter="all"
+      data-active="true"
+      class="sk-chip"
+    >
+      All <span class="text-text-faint/60 ml-1">{skills.categories.reduce((a, c) => a + c.skills.length, 0)}</span>
+    </button>
+    {
+      skills.categories.map((c) => (
+        <button
+          type="button"
+          data-filter={c.key}
+          data-active="false"
+          class="sk-chip"
+        >
+          {c.title} <span class="text-text-faint/60 ml-1">{c.skills.length}</span>
+        </button>
+      ))
+    }
+  </div>
+
+  {/* ── Category cards ─────────────────────────────────────────── */}
+  <ul
+    data-reveal="5"
+    class="reveal mt-5 md:mt-6 list-none p-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"
+  >
+    {
+      skills.categories.map((c, i) => {
+        const accent = c.accent;
+        return (
+          <li data-category={c.key} class="sk-cell">
+            <article
+              class={`sk-card relative h-full flex flex-col rounded-xl bg-bg-subtle/55 backdrop-blur-sm border border-border-subtle p-5 transition-[transform,box-shadow,border-color,opacity] duration-300 hover:-translate-y-0.5 ${ACCENT_BORDER[accent]} overflow-hidden`}
+              data-magnet
+              data-tilt
+              data-accent={accent}
+              style="transform: translate(0,0);"
+            >
+              {/* Top accent gradient bar */}
+              <span
+                class={`pointer-events-none absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${ACCENT_BAR[accent]} z-[3]`}
+                aria-hidden="true"
+              ></span>
+
+              {/* Cursor-tracking spotlight */}
+              <span class="sk-spotlight" aria-hidden="true"></span>
+
+              {/* Index badge — deepest z-translate so it pops forward most */}
+              <span
+                class="sk-index absolute top-2.5 right-3 font-mono text-[9px] uppercase tracking-[0.18em] text-text-faint/70 select-none"
+                aria-hidden="true"
+              >
+                {pad2(i + 1)} / {pad2(totalCats)}
+              </span>
+
+              <details class="sk-card-inner sk-details" open={i === 0}>
+                {/* Title row doubles as the accordion trigger on mobile */}
+                <summary class="sk-summary sk-layer-title list-none flex items-center gap-2 pr-12 cursor-pointer md:cursor-default">
+                  <span class={`block w-2 h-2 rounded-full ${ACCENT_DOT[accent]} shrink-0`} aria-hidden="true"></span>
+                  <h3 class="text-text-primary text-[15px] font-semibold tracking-tight">{c.title}</h3>
+                  <span class="ml-auto font-mono text-[10px] text-text-faint">{c.skills.length}</span>
+                  {/* Mobile-only chevron */}
+                  <svg
+                    class="sk-chevron text-text-faint shrink-0 md:hidden transition-transform duration-300"
+                    width="14" height="14" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true"
+                    style="display:block"
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+
+                {/* Separator */}
+                <span class="sk-layer-sep block border-t border-border-subtle/60 mt-3 mb-3.5" aria-hidden="true"></span>
+
+                {/* Skill chips — each gets --chip-i for staggered reveal */}
+                <ul class="sk-layer-chips flex flex-wrap gap-1.5 list-none p-0">
+                  {c.skills.map((s, ci) => (
+                    <li class="sk-chip-li" style={`--chip-i: ${ci}`}>
+                      <span class={`inline-flex items-center px-2 py-1 rounded-md font-mono text-[11.5px] text-text-muted border border-border-subtle/80 bg-bg-subtle/40 transition-colors ${ACCENT_PILL_HOVER[accent]}`}>
+                        {s}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            </article>
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>
+
+<style is:global>
+  /* ── Atmospheric backdrop (top-right blob — fresh corner for variety) ── */
+  .sk-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.10) 1px, transparent 0);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 25%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 25%, transparent 80%);
+  }
+  .sk-blob {
+    position: absolute;
+    z-index: -1;
+    top: -140px;
+    right: -100px;
+    width: 520px;
+    height: 520px;
+    border-radius: 9999px;
+    background: conic-gradient(from 280deg, rgba(34,211,238,0.18), rgba(251,191,36,0.14), rgba(168,85,247,0.18), rgba(34,211,238,0.18));
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ── Animated heading underline ──────────────────────────────── */
+  .sk-underline {
+    display: block;
+    margin-top: 18px;
+    height: 2px;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #22d3ee, #a855f7);
+    transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;
+    will-change: width;
+  }
+  .skills-section[data-visible='true'] .sk-underline { width: 120px; }
+
+  /* ── Reveal cascade ──────────────────────────────────────────── */
+  .skills-section .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .skills-section[data-visible='true'] .reveal { opacity: 1; transform: translateY(0); }
+  .skills-section[data-visible='true'] .reveal[data-reveal='0'] { transition-delay:   0ms; }
+  .skills-section[data-visible='true'] .reveal[data-reveal='1'] { transition-delay:  90ms; }
+  .skills-section[data-visible='true'] .reveal[data-reveal='2'] { transition-delay: 160ms; }
+  .skills-section[data-visible='true'] .reveal[data-reveal='3'] { transition-delay: 240ms; }
+  .skills-section[data-visible='true'] .reveal[data-reveal='4'] { transition-delay: 340ms; }
+  .skills-section[data-visible='true'] .reveal[data-reveal='5'] { transition-delay: 420ms; }
+
+  /* ── Filter chips ────────────────────────────────────────────── */
+  .sk-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    color: #9ca3af;
+    background-color: rgba(17, 17, 17, 0.4);
+    border: 1px solid #222222;
+    transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease;
+    cursor: pointer;
+  }
+  .sk-chip:hover {
+    color: #ededed;
+    border-color: rgba(34, 211, 238, 0.35);
+  }
+  .sk-chip[data-active='true'] {
+    color: #22d3ee;
+    background-color: rgba(34, 211, 238, 0.08);
+    border-color: rgba(34, 211, 238, 0.45);
+  }
+  .sk-chip:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.7), 0 0 0 4px #0a0a0a;
+  }
+
+  /* ── Mobile-only accordion (Skills cards collapse below md) ──── */
+  .sk-summary { list-style: none; }
+  .sk-summary::-webkit-details-marker { display: none; }
+  .sk-details[open] .sk-chevron { transform: rotate(180deg); }
+  /* On md+, JS keeps every <details> in the open state so the chips render.
+     Hide the chevron and revert the cursor since taps shouldn't toggle. */
+  @media (min-width: 768px) {
+    .sk-summary { cursor: default; }
+  }
+
+  /* ── 3D tilt on category cards ───────────────────────────────── */
+  .sk-cell { perspective: 1100px; }
+  .sk-card-inner {
+    transform-style: preserve-3d;
+    transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sk-card:hover .sk-card-inner {
+    transition-duration: 120ms;
+  }
+
+  /* Layered depth — each piece sits at a different translateZ so the tilt
+     becomes a real 3D scene instead of a flat rotate. */
+  .sk-card-inner { transform-style: preserve-3d; position: relative; }
+  .sk-layer-title { transform: translateZ(24px); }
+  .sk-layer-sep   { transform: translateZ(8px);  }
+  .sk-layer-chips { transform: translateZ(14px); transform-style: preserve-3d; }
+  .sk-index       { transform: translateZ(32px); z-index: 2; }
+
+  /* ── Cursor-tracking spotlight ───────────────────────────────── */
+  .sk-spotlight {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 220ms ease;
+    background: radial-gradient(
+      360px circle at var(--sk-mx, 50%) var(--sk-my, 50%),
+      var(--sk-color, rgba(34, 211, 238, 0.18)),
+      transparent 50%
+    );
+  }
+  .sk-card:hover .sk-spotlight,
+  .sk-card:focus-within .sk-spotlight { opacity: 1; }
+  /* Per-accent spotlight color */
+  .sk-card[data-accent='cyan']   { --sk-color: rgba(34,  211, 238, 0.20); }
+  .sk-card[data-accent='amber']  { --sk-color: rgba(251, 191, 36,  0.18); }
+  .sk-card[data-accent='rose']   { --sk-color: rgba(244, 63,  94,  0.18); }
+  .sk-card[data-accent='violet'] { --sk-color: rgba(168, 85,  247, 0.20); }
+
+  /* ── Chip stagger reveal ─────────────────────────────────────── */
+  .sk-chip-li {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .skills-section[data-visible='true'] .sk-chip-li {
+    animation: sk-chip-in 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    /* Cards begin around 420ms; chips cascade afterwards. 24ms per chip
+       keeps a 16-chip card under 600ms. */
+    animation-delay: calc(620ms + var(--chip-i, 0) * 24ms);
+  }
+  @keyframes sk-chip-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Filter dim state ────────────────────────────────────────── */
+  .sk-cell[data-dimmed='true'] .sk-card {
+    opacity: 0.28;
+    filter: saturate(0.5);
+  }
+  .sk-cell[data-dimmed='true'] .sk-card:hover {
+    opacity: 0.55;
+  }
+
+  /* ── Reduced motion ─────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .skills-section .reveal { opacity: 1; transform: none; transition: none; }
+    .sk-underline { width: 120px; transition: none; }
+    .sk-card-inner { transform: none !important; transition: none; }
+    .sk-grid, .sk-blob { transform: none !important; }
+    .sk-spotlight { display: none; }
+    .sk-chip-li { opacity: 1; transform: none; animation: none !important; }
+    .sk-layer-title, .sk-layer-sep, .sk-layer-chips, .sk-index {
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('section#skills.skills-section');
+  if (section) {
+    // ── Section reveal toggle ────────────────────────────────────────
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).dataset.visible = 'true';
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -15% 0px', threshold: 0.1 }
+    );
+    io.observe(section);
+
+    // ── Mobile-only accordion: keep all <details> open on md+ ───────
+    const detailsEls = section.querySelectorAll<HTMLDetailsElement>('.sk-details');
+    const mq = matchMedia('(min-width: 768px)');
+    const applyDetailsState = () => {
+      const desktop = mq.matches;
+      detailsEls.forEach((d, i) => {
+        if (desktop) {
+          d.open = true;
+        } else {
+          // On mobile, only the first card (Languages) defaults open.
+          // Don't overwrite a user-toggled state on subsequent runs.
+          if (!d.dataset.touched) d.open = i === 0;
+        }
+      });
+    };
+    detailsEls.forEach((d) => {
+      d.addEventListener('toggle', () => {
+        if (!mq.matches) d.dataset.touched = 'true';
+      });
+    });
+    applyDetailsState();
+    mq.addEventListener('change', () => {
+      // Resize across the breakpoint: reset the touched flag so
+      // mobile→desktop→mobile cycles re-apply the "only Languages open" rule.
+      detailsEls.forEach((d) => delete d.dataset.touched);
+      applyDetailsState();
+    });
+
+    // ── Filter chip behavior ─────────────────────────────────────────
+    const chips = section.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const cells = section.querySelectorAll<HTMLElement>('[data-category]');
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const f = chip.getAttribute('data-filter') ?? 'all';
+        chips.forEach((c) => c.setAttribute('data-active', String(c === chip)));
+        cells.forEach((cell) => {
+          const cat = cell.getAttribute('data-category');
+          const match = f === 'all' || cat === f;
+          cell.setAttribute('data-dimmed', String(!match));
+        });
+      });
+    });
+
+    // ── 3D tilt + magnetic translate on category cards ───────────────
+    const TILT_MAX = 5;          // degrees
+    const MAG_STRENGTH = 0.05;
+    const MAG_MAX = 2;           // px
+
+    section.querySelectorAll<HTMLElement>('[data-tilt]').forEach((card) => {
+      const inner = card.querySelector<HTMLElement>('.sk-card-inner');
+      card.addEventListener('pointermove', (e) => {
+        if ((e as PointerEvent).pointerType !== 'mouse') return;
+        const rect = card.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width;
+        const py = (e.clientY - rect.top) / rect.height;
+        const ry = (px - 0.5) * 2 * TILT_MAX;
+        const rx = -(py - 0.5) * 2 * TILT_MAX;
+        if (inner) inner.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+
+        // Update spotlight position to follow cursor in-card
+        card.style.setProperty('--sk-mx', `${(px * 100).toFixed(1)}%`);
+        card.style.setProperty('--sk-my', `${(py * 100).toFixed(1)}%`);
+
+        // Tiny magnet on the outer wrap so the whole card has slight movement too
+        const dx = (e.clientX - (rect.left + rect.width / 2)) * MAG_STRENGTH;
+        const dy = (e.clientY - (rect.top + rect.height / 2)) * MAG_STRENGTH;
+        const cx = Math.max(-MAG_MAX, Math.min(MAG_MAX, dx));
+        const cy = Math.max(-MAG_MAX, Math.min(MAG_MAX, dy));
+        card.style.transform = `translate(${cx}px, ${cy}px)`;
+      });
+      card.addEventListener('pointerleave', () => {
+        if (inner) inner.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        card.style.transform = 'translate(0, 0)';
+      });
+    });
+
+    // ── Parallax on backdrop ─────────────────────────────────────────
+    const grid = section.querySelector<HTMLElement>('.sk-grid');
+    const blob = section.querySelector<HTMLElement>('.sk-blob');
+    const parallaxOk = matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    if ((grid || blob) && parallaxOk) {
+      let raf = 0;
+      const onScroll = () => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          const rect = section.getBoundingClientRect();
+          const vh = window.innerHeight || 1;
+          const progress = (vh - rect.top) / (vh + rect.height);
+          const clamped = Math.max(-0.5, Math.min(1.5, progress));
+          if (grid) grid.style.transform = `translateY(${(-clamped * 40).toFixed(1)}px)`;
+          if (blob) blob.style.transform = `translateY(${(clamped * 25).toFixed(1)}px)`;
+        });
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+  }
+</script>

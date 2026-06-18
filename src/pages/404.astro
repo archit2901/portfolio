@@ -1,0 +1,120 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { site } from '~/content/site';
+
+const anchorSections = site.nav.links
+  .filter((l) => l.href.startsWith('#'))
+  .map((l) => l.label.toLowerCase());
+---
+
+<BaseLayout
+  title={`${site.name} — 404`}
+  description="Page not found."
+>
+  <section class="relative isolate overflow-hidden min-h-[calc(100vh-12rem)] px-5 sm:px-8 mx-auto w-full max-w-container flex items-center">
+    {/* Atmospheric backdrop (reuse the dotted-grid pattern) */}
+    <div class="nf-grid" aria-hidden="true"></div>
+
+    <div class="w-full max-w-2xl mx-auto py-16 md:py-20">
+      {/* 404 label */}
+      <p class="font-mono text-xs text-text-faint tracking-[0.18em] uppercase mb-6">
+        <span class="text-accent/80">404</span>
+        <span class="mx-2 text-text-faint/70">·</span>
+        <span>route not found</span>
+      </p>
+
+      {/* Terminal block */}
+      <div class="rounded-md border border-border-subtle bg-bg-subtle/60 backdrop-blur-sm p-3.5 md:p-5 font-mono text-[12px] sm:text-[13px] leading-[1.65] text-text-muted overflow-hidden break-words">
+        {/* macOS dots */}
+        <div class="flex items-center gap-1 mb-3" aria-hidden="true">
+          <span class="block w-2 h-2 rounded-full bg-traffic-red/80"></span>
+          <span class="block w-2 h-2 rounded-full bg-traffic-yellow/80"></span>
+          <span class="block w-2 h-2 rounded-full bg-traffic-green/80"></span>
+        </div>
+
+        {/* $ cat /requested-path */}
+        <div>
+          <span class="text-accent">archit</span><span class="text-text-faint"> @ </span><span class="text-text-primary">portfolio</span><span class="text-text-faint">:~$ </span>
+          <span class="text-text-primary">cat </span>
+          <span id="nf-path" class="text-text-primary">(unknown)</span>
+        </div>
+        <div class="text-rose-300/90">
+          cat: <span id="nf-path-echo">(unknown)</span>: No such file or directory
+        </div>
+
+        <div class="h-2"></div>
+
+        {/* $ ls / */}
+        <div>
+          <span class="text-accent">archit</span><span class="text-text-faint"> @ </span><span class="text-text-primary">portfolio</span><span class="text-text-faint">:~$ </span>
+          <span class="text-text-primary">ls /</span>
+        </div>
+        <div class="text-text-muted flex flex-wrap gap-x-3 gap-y-1">
+          {anchorSections.map((s) => (
+            <a
+              href={`/#${s}`}
+              class="text-cyan-300/90 hover:text-cyan-200 hover:underline underline-offset-2"
+            >{s}/</a>
+          ))}
+          <a
+            href="/blog"
+            class="text-cyan-300/90 hover:text-cyan-200 hover:underline underline-offset-2"
+          >blog/</a>
+          <a
+            href="/resume.pdf"
+            class="text-cyan-300/90 hover:text-cyan-200 hover:underline underline-offset-2"
+          >resume.pdf</a>
+        </div>
+
+        <div class="h-2"></div>
+
+        {/* $ cd / */}
+        <div>
+          <span class="text-accent">archit</span><span class="text-text-faint"> @ </span><span class="text-text-primary">portfolio</span><span class="text-text-faint">:~$ </span>
+          <a
+            href="/"
+            class="text-text-primary hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
+          >cd /</a>
+          <span class="term-cursor ml-0.5">█</span>
+        </div>
+      </div>
+
+      {/* ⌘K hint */}
+      <p class="mt-6 font-mono text-[11.5px] text-text-faint">
+        Press
+        <kbd class="inline-flex items-center px-1.5 py-0.5 mx-1 rounded text-[10px] text-text-muted border border-border-subtle bg-bg-base/60">⌘K</kbd>
+        for the command palette.
+      </p>
+    </div>
+  </section>
+
+  <style is:global>
+    /* Backdrop only used on the 404 — minimal pattern, no blob */
+    .nf-grid {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.08) 1px, transparent 0);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, #000 25%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, #000 25%, transparent 80%);
+    }
+  </style>
+
+  <script is:inline>
+    // Show the requested path on a static build. Re-fire on each navigation
+    // so the placeholder doesn't linger after a soft view transition.
+    (() => {
+      const set = () => {
+        const path = window.location.pathname;
+        const pathEl = document.getElementById('nf-path');
+        const echoEl = document.getElementById('nf-path-echo');
+        if (pathEl) pathEl.textContent = path;
+        if (echoEl) echoEl.textContent = path;
+      };
+      set();
+      document.addEventListener('astro:page-load', set);
+    })();
+  </script>
+</BaseLayout>

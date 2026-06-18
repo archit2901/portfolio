@@ -1,0 +1,404 @@
+---
+import { site } from '~/content/site';
+
+const { about, name: ownerName } = site;
+const avatarCaption = about.avatarCaption || 'Boston, MA · ET';
+---
+
+<section
+  id="about"
+  data-visible="false"
+  class="about-section relative isolate overflow-hidden border-t border-border-subtle/40 px-5 sm:px-8 py-16 sm:py-24 md:py-32 mx-auto w-full max-w-container"
+>
+  {/* Atmospheric backdrop */}
+  <div class="about-grid" aria-hidden="true"></div>
+  <div class="about-blob" aria-hidden="true"></div>
+
+  {/* Section label */}
+  <p
+    data-reveal="0"
+    class="reveal font-mono text-xs text-text-faint tracking-wider mb-4"
+  >
+    <span class="text-accent/80">{about.sectionLabel.split('·')[0].trim()}</span>
+    <span class="mx-1.5 text-text-faint/70">·</span>
+    <span>{about.sectionLabel.split('·')[1]?.trim() ?? 'About'}</span>
+  </p>
+
+  {/* Mobile-only profile-card row — avatar + name + location. Desktop uses
+       the polaroid card in the right column below; this row hides on md+. */}
+  <div data-reveal="0" class="reveal md:hidden mb-7 flex items-center gap-5">
+    <div class="relative shrink-0">
+      <div
+        aria-hidden="true"
+        class="absolute -inset-2 rounded-full bg-accent/[0.18] blur-xl pointer-events-none"
+      ></div>
+      <img
+        src={about.portrait.src}
+        alt={about.portrait.alt}
+        width="280"
+        height="280"
+        loading="lazy"
+        decoding="async"
+        class="relative block w-[140px] h-[140px] rounded-full object-cover border border-border-strong ring-1 ring-white/[0.06]"
+        style="object-position: 50% 15%;"
+      />
+      {/* Breathing presence dot */}
+      <span
+        class="absolute bottom-1 right-1 block w-3 h-3 rounded-full bg-accent border-2 border-bg-base wordmark-dot"
+        aria-hidden="true"
+      ></span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="font-mono text-[10px] text-text-faint uppercase tracking-[0.18em]">{ownerName}</p>
+      <p class="mt-0.5 text-text-muted text-[13px] truncate">{avatarCaption}</p>
+    </div>
+  </div>
+
+  {/* Display heading + animated underline */}
+  <h2
+    data-reveal="1"
+    class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
+  >
+    {about.heading}
+  </h2>
+  <span data-reveal="2" class="reveal about-underline" aria-hidden="true"></span>
+
+  {/* Two-column body */}
+  <div class="mt-8 sm:mt-12 md:mt-16 grid md:grid-cols-[1.4fr_1fr] gap-10 lg:gap-14 items-start">
+    {/* ── Left column: bio + tech ─────────────────────────────────── */}
+    <div>
+      {about.intro && (
+        <p
+          data-reveal="3"
+          class="reveal text-text-primary text-lg md:text-xl leading-relaxed max-w-[58ch] text-justify hyphens-auto"
+        >
+          {about.intro}
+        </p>
+      )}
+
+      {/* First bio paragraph — always visible, even on mobile */}
+      {about.bio[0] && (
+        <p
+          data-reveal="4"
+          class="reveal text-text-muted leading-relaxed max-w-[60ch] text-justify hyphens-auto"
+        >
+          {about.bio[0]}
+        </p>
+      )}
+
+      {/* Mobile: collapse paragraphs[1..] + tech pills behind "Read more".
+           Desktop: CSS forces the content visible regardless of [open]. */}
+      <details data-mobile-collapse class="about-collapse mt-5">
+        <summary class="about-collapse-summary md:hidden list-none cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border-subtle bg-bg-subtle/40 hover:border-accent/40 hover:text-accent transition-colors font-mono text-[12px] text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base">
+          <span class="block w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+          <span class="about-collapse-label-closed">Read more</span>
+          <span class="about-collapse-label-open">Read less</span>
+          <svg
+            class="about-chevron transition-transform duration-300"
+            width="12" height="12" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true"
+            style="display:block"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </summary>
+
+        <div class="about-collapse-content">
+          {
+            about.bio.slice(1).map((paragraph, i) => (
+              <p
+                data-reveal={5 + i}
+                class="reveal text-text-muted leading-relaxed max-w-[60ch] text-justify hyphens-auto mt-5"
+              >
+                {paragraph}
+              </p>
+            ))
+          }
+
+          <ul
+            data-reveal={4 + about.bio.length}
+            class="reveal mt-8 flex flex-wrap gap-2 list-none p-0"
+            aria-label="Tech I work with"
+          >
+            {
+              about.techStack.map((tech) => (
+                <li>
+                  <span class="tech-pill inline-flex items-center px-3 py-1.5 rounded-full font-mono text-[12px] text-text-muted border border-border-subtle bg-bg-subtle/40 hover:text-accent hover:border-accent/40 hover:bg-accent/[0.06] transition-colors">
+                    {tech}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    {/* ── Right column: portrait only — desktop-only (mobile uses the
+           avatar+caption row near the section header instead) ───────── */}
+    <div class="hidden md:flex flex-col items-center justify-center">
+      <div
+        data-reveal="3"
+        class="reveal portrait-tilt relative w-full max-w-[220px] sm:max-w-[260px] md:max-w-[280px]"
+      >
+        {/* Soft cyan glow halo */}
+        <div
+          aria-hidden="true"
+          class="absolute -inset-3 rounded-3xl bg-accent/[0.12] blur-2xl pointer-events-none"
+        ></div>
+        <div class="portrait-tilt-inner relative rounded-2xl overflow-hidden border border-border-strong bg-bg-subtle/60 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.7)]">
+          <img
+            src={about.portrait.src}
+            alt={about.portrait.alt}
+            width="480"
+            height="640"
+            loading="lazy"
+            decoding="async"
+            class="block w-full h-auto aspect-[3/4] object-cover"
+          />
+          {/* Cursor-tracking shine */}
+          <div class="portrait-shine pointer-events-none absolute inset-0" aria-hidden="true"></div>
+          {/* Subtle inner frame */}
+          <div class="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/[0.05]"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* ── Bento row of facts ────────────────────────────────────────── */}
+  <ul
+    data-reveal="6"
+    class="reveal mt-10 md:mt-14 grid grid-cols-2 md:grid-cols-4 gap-3 list-none p-0"
+  >
+    {
+      about.facts.map((fact) => (
+        <li>
+          <div
+            class="fact-card group relative h-full rounded-xl p-4 bg-bg-subtle/50 backdrop-blur-sm border border-border-subtle transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-[0_8px_24px_-12px_rgba(34,211,238,0.4)]"
+            data-magnet
+            style="transform: translate(0,0);"
+          >
+            <p class="font-mono text-[10px] tracking-wider text-text-faint uppercase">{fact.label}</p>
+            <p class="mt-1.5 text-text-primary text-sm font-medium">{fact.value}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  /* ── Atmospheric backdrop ────────────────────────────────────────── */
+  .about-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.10) 1px, transparent 0);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 35%, #000 25%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 35%, #000 25%, transparent 80%);
+    will-change: transform;
+  }
+  .about-blob {
+    position: absolute;
+    z-index: -1;
+    top: -120px;
+    right: -120px;
+    width: 540px;
+    height: 540px;
+    border-radius: 9999px;
+    background: conic-gradient(from 200deg, rgba(34,211,238,0.18), rgba(168,85,247,0.18), rgba(34,211,238,0.18));
+    filter: blur(60px);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  /* ── Animated heading underline (draws in on reveal) ─────────────── */
+  .about-underline {
+    display: block;
+    margin-top: 18px;
+    height: 2px;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #22d3ee, #a855f7);
+    transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;
+    will-change: width;
+  }
+  .about-section[data-visible='true'] .about-underline { width: 120px; }
+
+  /* ── Scroll-in reveal animations ─────────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .about-section[data-visible='true'] .reveal { opacity: 1; transform: translateY(0); }
+  .about-section[data-visible='true'] .reveal[data-reveal='0'] { transition-delay:   0ms; }
+  .about-section[data-visible='true'] .reveal[data-reveal='1'] { transition-delay:  90ms; }
+  .about-section[data-visible='true'] .reveal[data-reveal='2'] { transition-delay: 160ms; }
+  .about-section[data-visible='true'] .reveal[data-reveal='3'] { transition-delay: 240ms; }
+  .about-section[data-visible='true'] .reveal[data-reveal='4'] { transition-delay: 320ms; }
+  .about-section[data-visible='true'] .reveal[data-reveal='5'] { transition-delay: 400ms; }
+  .about-section[data-visible='true'] .reveal[data-reveal='6'] { transition-delay: 480ms; }
+
+  /* ── Tilting portrait card ──────────────────────────────────────── */
+  .portrait-tilt {
+    perspective: 1000px;
+  }
+  .portrait-tilt-inner {
+    --rx: -2deg;
+    --ry: 3deg;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transform-style: preserve-3d;
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+  .portrait-tilt:hover .portrait-tilt-inner {
+    transition-duration: 120ms;
+  }
+  .portrait-shine {
+    background: radial-gradient(
+      400px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.10),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 250ms ease;
+  }
+  .portrait-tilt:hover .portrait-shine { opacity: 1; }
+
+  /* ── Mobile-only "Read more" collapse ─────────────────────────── */
+  .about-collapse-summary { list-style: none; }
+  .about-collapse-summary::-webkit-details-marker { display: none; }
+  .about-collapse[open] .about-chevron { transform: rotate(180deg); }
+  .about-collapse-label-open { display: none; }
+  .about-collapse[open] .about-collapse-label-closed { display: none; }
+  .about-collapse[open] .about-collapse-label-open { display: inline; }
+
+  /* On md+, always show the collapse content even when [open] is unset,
+     and hide the summary chip entirely. JS still toggles `open` for SR users. */
+  @media (min-width: 768px) {
+    .about-collapse > .about-collapse-content { display: block !important; }
+  }
+
+  /* ── Reduced motion gates ────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .about-underline { width: 120px; transition: none; }
+    .portrait-tilt-inner { transform: none; transition: none; }
+    .portrait-shine { display: none; }
+    .about-grid { transform: none !important; }
+    .about-chevron { transition: none; }
+  }
+</style>
+
+<script>
+  // ── Scroll-in reveal: flip data-visible once section enters ─────────
+  const section = document.querySelector<HTMLElement>('section#about.about-section');
+  if (section) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).dataset.visible = 'true';
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -15% 0px', threshold: 0.1 }
+    );
+    io.observe(section);
+
+    // ── Mobile-only collapse: keep <details> open on md+ ─────────────
+    const collapses = section.querySelectorAll<HTMLDetailsElement>('[data-mobile-collapse]');
+    const mq = matchMedia('(min-width: 768px)');
+    const apply = () => {
+      const desktop = mq.matches;
+      collapses.forEach((d) => {
+        if (desktop) d.open = true;
+        else if (!d.dataset.touched) d.open = false;
+      });
+    };
+    collapses.forEach((d) => {
+      d.addEventListener('toggle', () => {
+        if (!mq.matches) d.dataset.touched = 'true';
+      });
+    });
+    apply();
+    mq.addEventListener('change', () => {
+      collapses.forEach((d) => delete d.dataset.touched);
+      apply();
+    });
+  }
+
+  // ── Portrait 3D tilt ────────────────────────────────────────────────
+  const tilt = section?.querySelector<HTMLElement>('.portrait-tilt');
+  const tiltInner = tilt?.querySelector<HTMLElement>('.portrait-tilt-inner');
+  const shine = tilt?.querySelector<HTMLElement>('.portrait-shine');
+  const TILT_MAX = 10; // degrees
+
+  tilt?.addEventListener('pointermove', (e) => {
+    if ((e as PointerEvent).pointerType !== 'mouse') return;
+    if (!tiltInner) return;
+    const rect = tilt.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;   // 0..1
+    const py = (e.clientY - rect.top) / rect.height;   // 0..1
+    const ry = (px - 0.5) * 2 * TILT_MAX;              // -10..10
+    const rx = -(py - 0.5) * 2 * TILT_MAX;             // -10..10
+    tiltInner.style.setProperty('--rx', `${rx}deg`);
+    tiltInner.style.setProperty('--ry', `${ry}deg`);
+    if (shine) {
+      shine.style.setProperty('--mx', `${px * 100}%`);
+      shine.style.setProperty('--my', `${py * 100}%`);
+    }
+  });
+
+  tilt?.addEventListener('pointerleave', () => {
+    if (!tiltInner) return;
+    // Return to gentle resting tilt
+    tiltInner.style.setProperty('--rx', `-2deg`);
+    tiltInner.style.setProperty('--ry', `3deg`);
+  });
+
+  // ── Magnetic micro-tilt on bento cards ──────────────────────────────
+  const MAG_STRENGTH = 0.08;
+  const MAG_MAX = 3;
+  section?.querySelectorAll<HTMLElement>('[data-magnet]').forEach((card) => {
+    card.addEventListener('pointermove', (e) => {
+      if ((e as PointerEvent).pointerType !== 'mouse') return;
+      const rect = card.getBoundingClientRect();
+      const dx = (e.clientX - (rect.left + rect.width / 2)) * MAG_STRENGTH;
+      const dy = (e.clientY - (rect.top + rect.height / 2)) * MAG_STRENGTH;
+      const cx = Math.max(-MAG_MAX, Math.min(MAG_MAX, dx));
+      const cy = Math.max(-MAG_MAX, Math.min(MAG_MAX, dy));
+      card.style.transform = `translate(${cx}px, ${cy}px)`;
+    });
+    card.addEventListener('pointerleave', () => {
+      card.style.transform = 'translate(0, 0)';
+    });
+  });
+
+  // ── Subtle parallax on the backdrop (grid + blob, opposing) ─────────
+  const grid = section?.querySelector<HTMLElement>('.about-grid');
+  const blob = section?.querySelector<HTMLElement>('.about-blob');
+  if ((grid || blob) && section && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const rect = section.getBoundingClientRect();
+        const vh = window.innerHeight || 1;
+        const progress = (vh - rect.top) / (vh + rect.height);
+        const clamped = Math.max(-0.5, Math.min(1.5, progress));
+        if (grid) grid.style.transform = `translateY(${(-clamped * 40).toFixed(1)}px)`;
+        if (blob) blob.style.transform = `translateY(${(clamped * 25).toFixed(1)}px)`;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+</script>

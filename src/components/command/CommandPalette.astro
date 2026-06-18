@@ -1,0 +1,473 @@
+---
+import { site } from '~/content/site';
+
+/**
+ * Static list of palette actions, computed at build time from the content
+ * file. Each item ships its kind (navigate / open / download / toggle),
+ * label, optional hint key chord, and target / handler key.
+ */
+type PaletteItem =
+  | { kind: 'navigate'; label: string; target: string; hint?: string; group: 'Navigate' }
+  | { kind: 'open';     label: string; href: string;   hint?: string; group: 'Open' }
+  | { kind: 'download'; label: string; href: string;   hint?: string; group: 'Download' }
+  | { kind: 'toggle';   label: string; action: string; hint?: string; group: 'Preferences' };
+
+// Map nav links to chord hints — letter after `g` that scrolls to that section.
+const NAV_HINT: Record<string, string> = {
+  about: 'g a',
+  experience: 'g e',
+  skills: 'g s',
+  projects: 'g p',
+  education: 'g d',
+  faq: 'g f',
+  contact: 'g c',
+};
+
+/** When off-home, anchor targets become `/#anchor` so activating a navigate
+ *  item from /projects goes back to the home page and scrolls correctly. */
+const isHome = Astro.url.pathname === '/' || Astro.url.pathname === '';
+const prefix = (anchor: string) => (isHome ? anchor : `/${anchor}`);
+
+const items: PaletteItem[] = [
+  { kind: 'navigate', group: 'Navigate', label: 'Top of page', target: isHome ? '#__top' : '/', hint: 'g h' },
+  ...site.nav.links
+    .filter((l) => l.href.startsWith('#'))
+    .map((l): PaletteItem => ({
+      kind: 'navigate',
+      group: 'Navigate',
+      label: l.label,
+      target: prefix(l.href),
+      hint: NAV_HINT[l.href.slice(1)] ?? undefined,
+    })),
+  // Blog is /blog, not an anchor — render as "Open"
+  ...site.nav.links
+    .filter((l) => !l.href.startsWith('#'))
+    .map((l): PaletteItem => ({
+      kind: 'open',
+      group: 'Open',
+      label: l.label,
+      href: l.href,
+    })),
+  ...site.hero.socials.map((s): PaletteItem => ({
+    kind: 'open',
+    group: 'Open',
+    label: s.label,
+    href: s.href,
+  })),
+  { kind: 'download', group: 'Download', label: 'Résumé (PDF)', href: site.nav.resumeHref },
+  { kind: 'toggle',   group: 'Preferences', label: 'Toggle reduced motion', action: 'reduce-motion' },
+];
+---
+
+<div
+  id="cmd-palette"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Command palette"
+  data-open="false"
+  class="cmd-palette fixed inset-0 z-[100] pointer-events-none opacity-0 transition-opacity duration-150 data-[open=true]:opacity-100 data-[open=true]:pointer-events-auto"
+>
+  {/* Backdrop */}
+  <div
+    class="cmd-backdrop absolute inset-0 bg-bg-base/70 backdrop-blur-md"
+    data-cmd-backdrop
+  ></div>
+
+  {/* Modal */}
+  <div class="absolute left-1/2 top-[15%] -translate-x-1/2 w-[92%] max-w-[560px]">
+    <div class="cmd-modal-wrap relative rounded-xl p-px">
+      <div class="cmd-modal relative rounded-xl bg-bg-subtle/90 backdrop-blur-xl border border-border-subtle shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] overflow-hidden">
+
+        {/* Search input */}
+        <div class="flex items-center gap-3 px-4 py-3 border-b border-border-subtle/70">
+          <span class="text-text-faint shrink-0" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-3-3"></path>
+            </svg>
+          </span>
+          <input
+            id="cmd-input"
+            type="text"
+            placeholder={site.commandPalette.placeholder}
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            class="flex-1 bg-transparent text-[14px] text-text-primary placeholder:text-text-faint focus:outline-none"
+          />
+          <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono text-text-faint border border-border-subtle/80 bg-bg-base/60">
+            esc
+          </kbd>
+        </div>
+
+        {/* Results list */}
+        <ul id="cmd-results" class="max-h-[380px] overflow-y-auto py-2 list-none m-0 p-0" role="listbox">
+          {/* Populated by JS */}
+        </ul>
+
+        {/* Empty state */}
+        <div
+          id="cmd-empty"
+          class="hidden px-4 py-8 text-center text-[13px] text-text-faint"
+        >
+          {site.commandPalette.noResults}
+        </div>
+
+        {/* Footer hints */}
+        <div class="flex items-center justify-between px-4 py-2 border-t border-border-subtle/70 text-[10px] font-mono text-text-faint">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1"><kbd class="cmd-kbd">↑</kbd><kbd class="cmd-kbd">↓</kbd> move</span>
+            <span class="inline-flex items-center gap-1"><kbd class="cmd-kbd">↵</kbd> select</span>
+            <span class="inline-flex items-center gap-1"><kbd class="cmd-kbd">esc</kbd> close</span>
+          </div>
+          <span class="inline-flex items-center gap-1">
+            <kbd class="cmd-kbd">⌘</kbd><kbd class="cmd-kbd">K</kbd>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  /* Rotating conic-gradient border (mirrors Résumé button vibe) */
+  @property --cmd-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+  .cmd-modal-wrap {
+    background: conic-gradient(
+      from var(--cmd-angle),
+      rgba(34, 211, 238, 0.55),
+      rgba(168, 85, 247, 0.4),
+      rgba(34, 211, 238, 0.55)
+    );
+    animation: cmd-angle-rot 10s linear infinite;
+  }
+  @keyframes cmd-angle-rot { to { --cmd-angle: 360deg; } }
+
+  .cmd-kbd {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.25);
+    color: #9ca3af;
+  }
+
+  /* Result row */
+  .cmd-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 100ms ease, color 100ms ease;
+  }
+  .cmd-item:hover,
+  .cmd-item[data-active='true'] {
+    background-color: rgba(34, 211, 238, 0.08);
+  }
+  .cmd-item[data-active='true'] .cmd-item-label {
+    color: #ededed;
+  }
+  .cmd-item-icon {
+    width: 14px;
+    height: 14px;
+    color: #67e8f9;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cmd-item-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .cmd-item-label {
+    flex: 1;
+    color: #9ca3af;
+    font-size: 14px;
+  }
+  .cmd-item-group {
+    color: #6b7280;
+    font-size: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+  }
+  .cmd-item-hint {
+    color: #6b7280;
+    font-size: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    flex-shrink: 0;
+  }
+
+  /* Group header */
+  .cmd-group-header {
+    padding: 8px 16px 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #6b7280;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cmd-modal-wrap { animation: none; }
+    .cmd-palette { transition: none; }
+  }
+</style>
+
+<script is:inline define:vars={{ items }}>
+  // ── Palette state + DOM refs ─────────────────────────────────────────
+  const palette = document.getElementById('cmd-palette');
+  const input = /** @type {HTMLInputElement | null} */ (document.getElementById('cmd-input'));
+  const list = document.getElementById('cmd-results');
+  const empty = document.getElementById('cmd-empty');
+  const backdrop = palette?.querySelector('[data-cmd-backdrop]');
+
+  if (palette && input && list && empty) {
+    let currentItems = [];
+    let activeIndex = 0;
+
+    // ── Fuzzy match (cheap, ~30 lines): score by substring + initials ──
+    function score(query, label) {
+      const q = query.toLowerCase().trim();
+      const l = label.toLowerCase();
+      if (!q) return 1; // No query: keep everything, base score
+      if (l === q) return 1000;
+      if (l.startsWith(q)) return 700;
+      if (l.includes(q)) return 500;
+      // Initials match (e.g., "ge" matches "Get Experience")
+      const initials = l.split(/[\s\-_/]+/).map((w) => w[0] || '').join('');
+      if (initials.startsWith(q)) return 400;
+      if (initials.includes(q)) return 200;
+      // Subsequence match: every char of q appears in order in l
+      let i = 0;
+      for (const ch of l) { if (ch === q[i]) i++; if (i === q.length) break; }
+      if (i === q.length) return 100;
+      return 0;
+    }
+
+    function filterItems(query) {
+      return items
+        .map((it) => ({ it, s: score(query, it.label) }))
+        .filter((x) => x.s > 0)
+        .sort((a, b) => b.s - a.s)
+        .map((x) => x.it);
+    }
+
+    const SVG_ATTRS = 'width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"';
+    const ICONS = {
+      navigate: `<svg ${SVG_ATTRS}><path d="M9 6 15 12 9 18"/></svg>`,
+      open:     `<svg ${SVG_ATTRS}><path d="M14 4 20 4 20 10"/><path d="M20 4 10 14"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></svg>`,
+      download: `<svg ${SVG_ATTRS}><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>`,
+      toggle:   `<svg ${SVG_ATTRS}><circle cx="8" cy="12" r="3"/><path d="M16 12a3 3 0 1 0 0 0Z" fill="currentColor"/><rect x="3" y="8" width="18" height="8" rx="4"/></svg>`,
+    };
+
+    function render(query) {
+      currentItems = filterItems(query);
+      list.innerHTML = '';
+      if (currentItems.length === 0) {
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      let lastGroup = '';
+      currentItems.forEach((it, idx) => {
+        if (it.group !== lastGroup) {
+          const h = document.createElement('li');
+          h.className = 'cmd-group-header';
+          h.textContent = it.group;
+          h.setAttribute('aria-hidden', 'true');
+          list.appendChild(h);
+          lastGroup = it.group;
+        }
+        const li = document.createElement('li');
+        li.className = 'cmd-item';
+        li.setAttribute('role', 'option');
+        li.dataset.index = String(idx);
+        li.innerHTML = `
+          <span class="cmd-item-icon">${ICONS[it.kind]}</span>
+          <span class="cmd-item-label">${escapeHtml(it.label)}</span>
+          ${it.hint ? `<span class="cmd-item-hint">${escapeHtml(it.hint)}</span>` : ''}
+        `;
+        li.addEventListener('click', () => activate(idx));
+        li.addEventListener('pointerenter', () => setActive(idx));
+        list.appendChild(li);
+      });
+      activeIndex = 0;
+      paintActive();
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function paintActive() {
+      const rows = list.querySelectorAll('.cmd-item');
+      rows.forEach((row, i) => {
+        row.setAttribute('data-active', String(i === activeIndex));
+      });
+      const active = rows[activeIndex];
+      if (active) active.scrollIntoView({ block: 'nearest' });
+    }
+
+    function setActive(i) {
+      if (i < 0 || i >= currentItems.length) return;
+      activeIndex = i;
+      paintActive();
+    }
+
+    function activate(i) {
+      const it = currentItems[i];
+      if (!it) return;
+      close();
+      if (it.kind === 'navigate') {
+        const t = it.target;
+        if (t === '#__top') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (t === '/') {
+          // off-home "Top of page" — navigate back to home
+          window.location.href = '/';
+        } else if (t.startsWith('#')) {
+          const el = document.querySelector(t);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          // /#anchor — full URL change, browser handles the scroll
+          window.location.href = t;
+        }
+      } else if (it.kind === 'open') {
+        const isExternal = /^https?:/.test(it.href);
+        if (isExternal) window.open(it.href, '_blank', 'noopener,noreferrer');
+        else window.location.href = it.href;
+      } else if (it.kind === 'download') {
+        const a = document.createElement('a');
+        a.href = it.href;
+        a.download = '';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } else if (it.kind === 'toggle' && it.action === 'reduce-motion') {
+        const on = document.documentElement.getAttribute('data-reduce-motion') !== 'true';
+        document.documentElement.setAttribute('data-reduce-motion', String(on));
+        try { localStorage.setItem('pref-reduce-motion', String(on)); } catch (e) {}
+      }
+    }
+
+    function open(initialQuery) {
+      if (!palette) return;
+      palette.dataset.open = 'true';
+      input.value = initialQuery || '';
+      render(input.value);
+      requestAnimationFrame(() => input.focus());
+      document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+      if (!palette) return;
+      palette.dataset.open = 'false';
+      document.body.style.overflow = '';
+      input.blur();
+    }
+
+    // ── Wire DOM events ───────────────────────────────────────────────
+    input.addEventListener('input', () => render(input.value));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(Math.min(activeIndex + 1, currentItems.length - 1)); }
+      else if (e.key === 'ArrowUp')   { e.preventDefault(); setActive(Math.max(activeIndex - 1, 0)); }
+      else if (e.key === 'Enter')      { e.preventDefault(); activate(activeIndex); }
+      else if (e.key === 'Escape')     { e.preventDefault(); close(); }
+    });
+    backdrop?.addEventListener('click', close);
+
+    // ── Public open/close API via custom events ──────────────────────
+    window.addEventListener('palette:open', (e) => {
+      const detail = /** @type {CustomEvent} */ (e).detail || {};
+      open(detail.query);
+    });
+    window.addEventListener('palette:close', close);
+
+    // ── Global key handler: ⌘K / Ctrl+K / ? / g+letter chords ────────
+    let chordPending = false;
+    let chordTimer = 0;
+
+    const NAV_TARGETS = {
+      h: '#__top',
+      a: '#about',
+      e: '#experience',
+      s: '#skills',
+      p: '#projects',
+      d: '#education',
+      f: '#faq',
+      c: '#contact',
+    };
+
+    window.addEventListener('keydown', (e) => {
+      const t = e.target;
+      const inField =
+        t instanceof HTMLInputElement ||
+        t instanceof HTMLTextAreaElement ||
+        (t instanceof HTMLElement && t.isContentEditable);
+
+      // ⌘K / Ctrl+K — always (even from input, since it should override field focus)
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (palette.dataset.open === 'true') close();
+        else open();
+        return;
+      }
+
+      if (inField) return;
+
+      // ? — open palette
+      if (e.key === '?') {
+        e.preventDefault();
+        open();
+        return;
+      }
+
+      // g chord init
+      if (e.key === 'g' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        chordPending = true;
+        clearTimeout(chordTimer);
+        chordTimer = window.setTimeout(() => { chordPending = false; }, 1000);
+        return;
+      }
+
+      if (chordPending) {
+        chordPending = false;
+        clearTimeout(chordTimer);
+        const target = NAV_TARGETS[e.key.toLowerCase()];
+        if (target) {
+          e.preventDefault();
+          const onHome = window.location.pathname === '/' || window.location.pathname === '';
+          if (target === '#__top') {
+            if (onHome) window.scrollTo({ top: 0, behavior: 'smooth' });
+            else window.location.href = '/';
+          } else if (onHome) {
+            document.querySelector(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            // Off-home: jump back to the home page with the anchor
+            window.location.href = `/${target}`;
+          }
+        }
+      }
+    });
+
+    // ── Restore the toggled reduced-motion pref on load ───────────────
+    try {
+      const stored = localStorage.getItem('pref-reduce-motion');
+      if (stored === 'true') document.documentElement.setAttribute('data-reduce-motion', 'true');
+    } catch (_) {}
+
+    // Initial render so the empty open state has the full list ready
+    render('');
+  }
+</script>

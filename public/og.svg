@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#0e1a22"/>
+      <stop offset="55%"  stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#161025"/>
+    </linearGradient>
+    <radialGradient id="halo-cyan" cx="85%" cy="18%" r="50%">
+      <stop offset="0%"   stop-color="#22d3ee" stop-opacity="0.45"/>
+      <stop offset="60%"  stop-color="#22d3ee" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo-violet" cx="10%" cy="92%" r="55%">
+      <stop offset="0%"   stop-color="#a855f7" stop-opacity="0.40"/>
+      <stop offset="60%"  stop-color="#a855f7" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent-line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#22d3ee" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background layers -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#halo-cyan)"/>
+  <rect width="1200" height="630" fill="url(#halo-violet)"/>
+
+  <!-- Decorative dots (echo the hero globe) -->
+  <g fill="#22d3ee" fill-opacity="0.55">
+    <circle cx="120" cy="120" r="2"/>
+    <circle cx="200" cy="180" r="1.5"/>
+    <circle cx="980" cy="160" r="2"/>
+    <circle cx="1080" cy="240" r="1.5"/>
+    <circle cx="140" cy="510" r="1.5"/>
+    <circle cx="1040" cy="490" r="2"/>
+  </g>
+
+  <!-- Section label, mirror the navbar ordinal -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" letter-spacing="3">
+    <text x="80" y="180" fill="#22d3ee" fill-opacity="0.85">PORTFOLIO</text>
+    <text x="180" y="180" fill="#9ca3af" fill-opacity="0.6">·</text>
+    <text x="200" y="180" fill="#9ca3af" fill-opacity="0.85">2026</text>
+  </g>
+
+  <!-- Big name -->
+  <text x="80" y="300"
+        font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-weight="600" font-size="92" fill="#ededed" letter-spacing="-2">
+    Archit Gupta
+  </text>
+
+  <!-- Subtitle with gradient -->
+  <text x="80" y="380"
+        font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-weight="500" font-size="44" fill="url(#accent-line)" letter-spacing="-0.5">
+    Full-stack engineer.
+  </text>
+
+  <!-- Underline -->
+  <rect x="80" y="408" width="160" height="3" rx="1.5" fill="url(#accent-line)"/>
+
+  <!-- Tagline -->
+  <text x="80" y="475"
+        font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="22" fill="#9ca3af">
+    APIs · infra · pixels. Building polished web experiences end-to-end.
+  </text>
+
+  <!-- URL pill -->
+  <g transform="translate(80, 530)">
+    <rect x="0" y="0" width="240" height="40" rx="20" fill="#111111" fill-opacity="0.65" stroke="#22d3ee" stroke-opacity="0.4"/>
+    <circle cx="22" cy="20" r="4" fill="#22d3ee"/>
+    <text x="38" y="26"
+          font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+          font-size="15" fill="#ededed">
+      architgupta.me
+    </text>
+  </g>
+
+  <!-- Bottom-right monogram tile -->
+  <g transform="translate(1020, 470)">
+    <rect x="0" y="0" width="100" height="100" rx="14" fill="#0a0a0a" stroke="#22d3ee" stroke-opacity="0.45" stroke-width="1.5"/>
+    <text x="50" y="68" text-anchor="middle"
+          font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+          font-weight="700" font-size="56" fill="#22d3ee">A</text>
+  </g>
+</svg>

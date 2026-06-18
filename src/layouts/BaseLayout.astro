@@ -1,0 +1,144 @@
+---
+import '~/styles/global.css';
+import Navbar from '~/components/Navbar.astro';
+import Footer from '~/components/Footer.astro';
+import CommandPalette from '~/components/command/CommandPalette.astro';
+import { site } from '~/content/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const pageTitle = title ?? site.meta.title;
+const pageDescription = description ?? site.meta.description;
+
+// Canonical URL — Astro.site is set in astro.config.mjs
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://architgupta.me').toString();
+const ogImageUrl = site.meta.ogImage
+  ? new URL(site.meta.ogImage, Astro.site ?? 'https://architgupta.me').toString()
+  : null;
+
+// Structured data — Person schema for SEO + recruiter ATS pipelines
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: Astro.site?.toString() ?? 'https://architgupta.me',
+  jobTitle: 'Software Engineer',
+  description: pageDescription,
+  email: site.hero.socials.find((s) => s.label === 'Email')?.href.replace(/^mailto:/, '') ?? '',
+  alumniOf: [
+    { '@type': 'CollegeOrUniversity', name: 'Northeastern University' },
+    { '@type': 'CollegeOrUniversity', name: 'Guru Gobind Singh Indraprastha University' },
+  ],
+  sameAs: site.hero.socials
+    .filter((s) => s.href.startsWith('http'))
+    .map((s) => s.href),
+};
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    {ogImageUrl && <meta property="og:image:width" content="1200" />}
+    {ogImageUrl && <meta property="og:image:height" content="630" />}
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+
+    <meta name="generator" content={Astro.generator} />
+
+    {/* Structured data — Person schema */}
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(personSchema)}
+    />
+  </head>
+  <body>
+    {/* Scroll progress bar */}
+    <div class="scroll-progress" aria-hidden="true"></div>
+
+    <Navbar />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+    <CommandPalette />
+
+    {/* Console signature for visiting devs */}
+    <script is:inline>
+      (() => {
+        const head = 'color:#22d3ee;font-size:14px;font-weight:600;padding:4px 0;';
+        const body = 'color:#9ca3af;font-size:12px;line-height:1.6;';
+        const link = 'color:#67e8f9;';
+        const kbd  = 'color:#67e8f9;background:#111;padding:1px 5px;border-radius:3px;border:1px solid #222;';
+        console.log('%c👋  hey, dev.', head);
+        console.log('%csite source: %chttps://github.com/archit2901/portfolio', body, link);
+        console.log('%cbuilt with: %castro 5 · tailwind · three.js', body, link);
+        console.log('%cpress %c⌘K%c to navigate', body, kbd, body);
+      })();
+    </script>
+
+    {/* Scroll progress driver */}
+    <script is:inline>
+      (() => {
+        const bar = document.querySelector('.scroll-progress');
+        if (!bar) return;
+        let raf = 0;
+        const update = () => {
+          const max = document.documentElement.scrollHeight - window.innerHeight;
+          const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+          bar.style.transform = `scaleX(${p})`;
+        };
+        const onScroll = () => {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(update);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', update);
+        update();
+      })();
+    </script>
+
+    <style is:global>
+      .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        z-index: 60;
+        background: linear-gradient(90deg, #22d3ee, #a855f7);
+        transform-origin: 0 50%;
+        transform: scaleX(0);
+        pointer-events: none;
+        will-change: transform;
+        transition: transform 80ms linear;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .scroll-progress { transition: none; }
+      }
+    </style>
+  </body>
+</html>

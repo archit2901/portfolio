@@ -1,0 +1,569 @@
+---
+import { site } from '~/content/site';
+
+/** When the navbar renders on a non-home route, anchor links like `#about`
+ *  need to become `/#about` so they always navigate back to the home page
+ *  and scroll to the section. The wordmark and external links stay as-is. */
+const isHome = Astro.url.pathname === '/' || Astro.url.pathname === '';
+const links = site.nav.links.map((l) => ({
+  ...l,
+  href: !isHome && l.href.startsWith('#') ? `/${l.href}` : l.href,
+}));
+---
+
+<header
+  id="site-nav"
+  data-scrolled="false"
+  class="fixed top-0 inset-x-0 z-50 h-16 transition-[background-color,backdrop-filter,box-shadow] duration-300 data-[scrolled=true]:bg-bg-base/70 data-[scrolled=true]:backdrop-blur-xl data-[scrolled=true]:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.6)]"
+>
+  {/* Aurora bottom edge — only shown when scrolled */}
+  <div class="aurora-edge" aria-hidden="true"></div>
+  <div class="aurora-edge-glow" aria-hidden="true"></div>
+
+  {/* Ambient depth orbs (decorative) */}
+  <span class="nav-orb nav-orb-cyan motion-reduce:hidden" aria-hidden="true"></span>
+  <span class="nav-orb nav-orb-violet motion-reduce:hidden" aria-hidden="true"></span>
+
+  <div class="relative mx-auto h-full max-w-container px-5 sm:px-8 flex items-center gap-6">
+    {/* Wordmark */}
+    <a
+      href="/"
+      class="group flex items-center gap-2.5 text-text-primary shrink-0 rounded-full px-1 -mx-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+    >
+      <span class="wordmark-dot relative block w-2 h-2 rounded-full bg-accent" aria-hidden="true"></span>
+      <span class="font-medium tracking-tight text-[15px] group-hover:text-accent transition-colors">
+        {site.nav.wordmark}
+      </span>
+    </a>
+
+    {/* Desktop nav links */}
+    <nav
+      id="nav-links"
+      aria-label="Primary"
+      class="relative hidden md:flex items-center gap-0.5 ml-2"
+    >
+      {/* Liquid pill: glow halo */}
+      <span
+        id="nav-indicator-glow"
+        data-on-active="false"
+        aria-hidden="true"
+        class="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 h-9 w-0 rounded-full opacity-0 blur-md transition-[transform,width,opacity] duration-[450ms] data-[on-active=true]:opacity-[0.6]"
+        style="background: linear-gradient(90deg, rgba(34,211,238,0.55), rgba(168,85,247,0.4), rgba(34,211,238,0.55)); transform: translateX(0px); transition-timing-function: cubic-bezier(0.22, 1.2, 0.36, 1);"
+      ></span>
+      {/* Liquid pill: solid */}
+      <span
+        id="nav-indicator"
+        data-on-active="false"
+        aria-hidden="true"
+        class="nav-indicator pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 h-8 w-0 rounded-full opacity-0 border border-white/[0.07] transition-[transform,width,opacity,background-color] duration-[450ms]"
+        style="transform: translateX(0px); transition-timing-function: cubic-bezier(0.22, 1.2, 0.36, 1);"
+      ></span>
+
+      {
+        links.map((link, i) => {
+          const ord = String(i + 1).padStart(2, '0');
+          return (
+            <a
+              href={link.href}
+              data-nav-link={link.href}
+              class="nav-link relative z-10 inline-flex items-baseline gap-2 px-3.5 py-2 text-[14px] rounded-full text-text-muted hover:text-text-primary transition-colors aria-[current=true]:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+              style="transform: translate(0,0); transition: transform 250ms ease, color 200ms ease;"
+            >
+              <span class="font-mono text-[10px] text-accent/70 tabular-nums leading-none">{ord}</span>
+              <span class="font-mono text-[10px] text-text-faint/70 leading-none -mx-1">·</span>
+              <span>{link.label}</span>
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    {/* Spacer */}
+    <div class="flex-1"></div>
+
+    {/* ⌘K command palette hint chip */}
+    <button
+      id="nav-cmdk"
+      type="button"
+      aria-label="Open command palette"
+      class="hidden md:inline-flex items-center gap-1 px-2.5 py-1 mr-2.5 rounded-md font-mono text-[11px] text-text-faint border border-border-subtle bg-bg-base/40 hover:text-accent hover:border-accent/40 hover:bg-accent/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+    >
+      <kbd class="font-mono">⌘</kbd>
+      <kbd class="font-mono">K</kbd>
+    </button>
+
+    {/* Résumé CTA with conic gradient border + shimmer */}
+    <div class="hidden md:block resume-btn-wrap relative" data-resume-wrap>
+      <a
+        href={site.nav.resumeHref}
+        download
+        class="resume-btn relative inline-flex items-center gap-2 px-4 py-2 rounded-full text-[13.5px] font-medium text-text-primary bg-bg-base/60 hover:text-accent transition-colors overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+      >
+        <span class="relative z-10">Résumé</span>
+        <svg
+          viewBox="0 0 24 24" width="14" height="14"
+          fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="relative z-10" aria-hidden="true"
+        >
+          <path d="M12 3v12"></path>
+          <path d="M7 10l5 5 5-5"></path>
+          <path d="M5 21h14"></path>
+        </svg>
+        {/* Shimmer overlay */}
+        <span class="resume-shimmer pointer-events-none absolute inset-0" aria-hidden="true"></span>
+      </a>
+    </div>
+
+    {/* Mobile: hamburger */}
+    <button
+      id="mobile-menu-toggle"
+      type="button"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      class="md:hidden relative w-10 h-10 -mr-2 flex items-center justify-center text-text-primary rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+    >
+      <span class="sr-only">Toggle menu</span>
+      <span class="block w-5 relative">
+        <span class="absolute left-0 right-0 h-[1.5px] bg-current rounded-full transition-transform duration-300 -translate-y-[5px] data-[open=true]:translate-y-0 data-[open=true]:rotate-45" data-bar></span>
+        <span class="absolute left-0 right-0 h-[1.5px] bg-current rounded-full transition-opacity duration-200 data-[open=true]:opacity-0" data-bar></span>
+        <span class="absolute left-0 right-0 h-[1.5px] bg-current rounded-full transition-transform duration-300 translate-y-[5px] data-[open=true]:translate-y-0 data-[open=true]:-rotate-45" data-bar></span>
+      </span>
+    </button>
+  </div>
+</header>
+
+{/* Full-screen mobile overlay menu */}
+<div
+  id="mobile-menu"
+  aria-hidden="true"
+  class="md:hidden fixed inset-0 z-40 pointer-events-none opacity-0 transition-opacity duration-300 data-[open=true]:opacity-100 data-[open=true]:pointer-events-auto"
+>
+  <div class="absolute inset-0 bg-bg-base/90 backdrop-blur-xl"></div>
+  <nav
+    aria-label="Mobile"
+    class="relative h-full flex flex-col items-center justify-center gap-5 px-8"
+  >
+    {
+      links.map((link, i) => {
+        const ord = String(i + 1).padStart(2, '0');
+        return (
+          <a
+            href={link.href}
+            data-mobile-link
+            data-stagger
+            class="flex items-baseline gap-2.5 text-2xl font-medium text-text-primary hover:text-accent transition-colors opacity-0 translate-y-2 data-[open=true]:opacity-100 data-[open=true]:translate-y-0 px-2 -mx-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+            style={`transition: opacity 400ms ease ${120 + i * 50}ms, transform 400ms ease ${120 + i * 50}ms, color 200ms ease;`}
+          >
+            <span class="font-mono text-xs text-accent/70 tabular-nums">{ord}</span>
+            <span class="font-mono text-xs text-text-faint/70">·</span>
+            <span>{link.label}</span>
+          </a>
+        );
+      })
+    }
+    <a
+      href={site.nav.resumeHref}
+      download
+      data-mobile-link
+      data-stagger
+      class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border border-accent/50 text-accent hover:bg-accent/10 transition-colors opacity-0 translate-y-2 data-[open=true]:opacity-100 data-[open=true]:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+      style={`transition: opacity 400ms ease ${120 + links.length * 50}ms, transform 400ms ease ${120 + links.length * 50}ms, background-color 200ms ease;`}
+    >
+      <span>Download résumé</span>
+    </a>
+  </nav>
+</div>
+
+{/* Spacer so the fixed navbar doesn't overlay page content. */}
+<div aria-hidden="true" class="h-16"></div>
+
+<style>
+  /* ── Conic-gradient angle property ────────────────────────────── */
+  @property --angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+
+  /* ── Aurora bottom edge (only visible when navbar is scrolled) ── */
+  .aurora-edge,
+  .aurora-edge-glow {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 400ms ease;
+    background:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(34, 211, 238, 0.55) 28%,
+        rgba(168, 85, 247, 0.55) 72%,
+        transparent 100%
+      );
+    background-size: 200% 100%;
+    background-position: 0% 50%;
+    animation: aurora-drift 14s linear infinite;
+  }
+  .aurora-edge {
+    bottom: -1px;
+    height: 1px;
+  }
+  .aurora-edge-glow {
+    bottom: -10px;
+    height: 12px;
+    filter: blur(8px);
+    opacity: 0;
+  }
+  #site-nav[data-scrolled='true'] .aurora-edge {
+    opacity: 1;
+  }
+  #site-nav[data-scrolled='true'] .aurora-edge-glow {
+    opacity: 0.45;
+  }
+  @keyframes aurora-drift {
+    0%   { background-position:   0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+
+  /* ── Ambient depth orbs ───────────────────────────────────────── */
+  .nav-orb {
+    position: absolute;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 9999px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 600ms ease;
+    filter: blur(2.5px);
+    box-shadow: 0 0 14px 4px currentColor;
+  }
+  #site-nav[data-scrolled='true'] .nav-orb {
+    opacity: 0.5;
+  }
+  .nav-orb-cyan {
+    color: #22d3ee;
+    background: #22d3ee;
+    animation: orb-drift-a 32s linear infinite;
+  }
+  .nav-orb-violet {
+    color: #a855f7;
+    background: #a855f7;
+    animation: orb-drift-b 40s linear infinite;
+  }
+  @keyframes orb-drift-a {
+    0%   { transform: translate(-40px, -10px); }
+    50%  { transform: translate(60vw,    6px); }
+    100% { transform: translate(105vw,  -8px); }
+  }
+  @keyframes orb-drift-b {
+    0%   { transform: translate(105vw, 10px); }
+    50%  { transform: translate(40vw,  -6px); }
+    100% { transform: translate(-40px,  8px); }
+  }
+
+  /* ── Résumé button: rotating conic border + shimmer ───────────── */
+  .resume-btn-wrap {
+    border-radius: 9999px;
+    padding: 1px;
+    background:
+      conic-gradient(
+        from var(--angle),
+        rgba(34, 211, 238, 0.85),
+        rgba(168, 85, 247, 0.85),
+        rgba(34, 211, 238, 0.85)
+      );
+    animation: angle-rot 6s linear infinite;
+    transition: filter 250ms ease;
+  }
+  .resume-btn-wrap:hover {
+    animation-duration: 2.5s;
+    filter: brightness(1.25) saturate(1.15);
+  }
+  .resume-btn {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  @keyframes angle-rot {
+    to { --angle: 360deg; }
+  }
+
+  .resume-shimmer {
+    background: linear-gradient(
+      105deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.22) 50%,
+      transparent 62%
+    );
+    transform: translateX(-150%);
+    animation: shimmer 8s ease-in-out infinite;
+  }
+  .resume-btn-wrap:hover .resume-shimmer {
+    animation-duration: 2.4s;
+  }
+  @keyframes shimmer {
+    0%, 85%, 100% { transform: translateX(-150%); }
+    42%           { transform: translateX(150%); }
+  }
+
+  /* ── Liquid pill gradient (intensifies when resting on the active link) ── */
+  .nav-indicator {
+    background: linear-gradient(
+      90deg,
+      rgba(34, 211, 238, 0.12),
+      rgba(168, 85, 247, 0.08) 50%,
+      rgba(34, 211, 238, 0.12)
+    );
+  }
+  .nav-indicator[data-on-active='true'] {
+    background: linear-gradient(
+      90deg,
+      rgba(34, 211, 238, 0.24),
+      rgba(168, 85, 247, 0.14) 50%,
+      rgba(34, 211, 238, 0.24)
+    );
+    border-color: rgba(34, 211, 238, 0.28);
+  }
+
+  /* First-paint: longer opacity fade so the pill eases in rather than popping */
+  .nav-indicator.is-initial,
+  #nav-indicator-glow.is-initial {
+    transition:
+      opacity 700ms ease,
+      transform 450ms cubic-bezier(0.22, 1.2, 0.36, 1),
+      width 450ms cubic-bezier(0.22, 1.2, 0.36, 1),
+      background-color 450ms ease !important;
+  }
+
+  /* Active link cyan ring marker — only when the pill has wandered off */
+  .nav-link[aria-current='true'][data-show-ring='true'] {
+    box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.35);
+  }
+
+  /* ── Wordmark breathing dot + hover halo ──────────────────────── */
+  .wordmark-dot {
+    animation: dot-breathe 2.4s ease-in-out infinite;
+    transition: box-shadow 220ms ease, transform 220ms ease;
+  }
+  .group:hover .wordmark-dot {
+    box-shadow: 0 0 0 6px rgba(34, 211, 238, 0.18);
+    transform: scale(1.08);
+  }
+  @keyframes dot-breathe {
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50%      { opacity: 1;    transform: scale(1.15); }
+  }
+
+  /* ── Reduced motion gates ─────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .aurora-edge,
+    .aurora-edge-glow { animation: none; }
+    .nav-orb { display: none; }
+    .resume-btn-wrap { animation: none; }
+    .resume-shimmer { display: none; }
+    .wordmark-dot { animation: none; opacity: 1; transform: none; }
+    #nav-indicator,
+    #nav-indicator-glow {
+      transition: opacity 200ms ease !important;
+    }
+  }
+</style>
+
+<script>
+  // ── ⌘K chip opens the command palette ──────────────────────────────
+  const cmdkChip = document.getElementById('nav-cmdk');
+  cmdkChip?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('palette:open'));
+  });
+
+  // ── Frosted-on-scroll ──────────────────────────────────────────────
+  const nav = document.getElementById('site-nav');
+  const onScroll = () => {
+    if (!nav) return;
+    nav.dataset.scrolled = window.scrollY > 8 ? 'true' : 'false';
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ── Mobile menu ────────────────────────────────────────────────────
+  const toggle = document.getElementById('mobile-menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  const bars = toggle?.querySelectorAll<HTMLElement>('[data-bar]');
+  const staggerItems = menu?.querySelectorAll<HTMLElement>('[data-stagger]');
+
+  const setMenuOpen = (open: boolean) => {
+    if (!menu || !toggle) return;
+    menu.dataset.open = String(open);
+    menu.setAttribute('aria-hidden', String(!open));
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    bars?.forEach((b) => (b.dataset.open = String(open)));
+    staggerItems?.forEach((el) => (el.dataset.open = String(open)));
+    document.body.style.overflow = open ? 'hidden' : '';
+  };
+
+  toggle?.addEventListener('click', () => {
+    setMenuOpen(menu?.dataset.open !== 'true');
+  });
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-mobile-link]').forEach((a) => {
+    a.addEventListener('click', () => setMenuOpen(false));
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu?.dataset.open === 'true') setMenuOpen(false);
+  });
+
+  // ── Active section + liquid pill cursor-follow ─────────────────────
+  const navContainer = document.getElementById('nav-links');
+  const indicator = document.getElementById('nav-indicator');
+  const glow = document.getElementById('nav-indicator-glow');
+  const navLinks = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>('#nav-links [data-nav-link]')
+  );
+
+  const anchorIds = navLinks
+    .map((a) => a.getAttribute('data-nav-link') ?? '')
+    .filter((href) => href.startsWith('#') && href.length > 1)
+    .map((href) => href.slice(1));
+
+  const sections = new Map<string, HTMLElement>();
+  for (const id of anchorIds) {
+    const el = document.getElementById(id);
+    if (el) sections.set(id, el);
+  }
+
+  let activeLink: HTMLAnchorElement | null = null;
+  let pillOnActive = false; // true when the pill is resting on the active link
+
+  const setActiveRing = (show: boolean) => {
+    // Show the cyan "home base" ring only when the pill is NOT covering active
+    if (!activeLink) return;
+    if (show) activeLink.setAttribute('data-show-ring', 'true');
+    else activeLink.removeAttribute('data-show-ring');
+  };
+
+  const moveIndicatorTo = (link: HTMLAnchorElement | null) => {
+    if (!indicator || !glow || !navContainer) return;
+    if (!link) {
+      indicator.style.opacity = '0';
+      glow.style.opacity = '0';
+      indicator.dataset.onActive = 'false';
+      glow.dataset.onActive = 'false';
+      pillOnActive = false;
+      setActiveRing(false);
+      return;
+    }
+    const navRect = navContainer.getBoundingClientRect();
+    const linkRect = link.getBoundingClientRect();
+    const x = linkRect.left - navRect.left;
+    const w = linkRect.width;
+    indicator.style.opacity = '1';
+    indicator.style.width = `${w}px`;
+    indicator.style.transform = `translateX(${x}px) translateY(-50%)`;
+    glow.style.opacity = '0.45';
+    glow.style.width = `${w}px`;
+    glow.style.transform = `translateX(${x}px) translateY(-50%)`;
+
+    pillOnActive = link === activeLink;
+    indicator.dataset.onActive = String(pillOnActive);
+    glow.dataset.onActive = String(pillOnActive);
+    // Ring is the "home base" marker; only show when pill has wandered away
+    setActiveRing(!pillOnActive);
+  };
+
+  const setActive = (id: string | null) => {
+    let next: HTMLAnchorElement | null = null;
+    for (const a of navLinks) {
+      const href = a.getAttribute('data-nav-link') ?? '';
+      const match = id !== null && href === `#${id}`;
+      if (match) {
+        a.setAttribute('aria-current', 'true');
+        next = a;
+      } else {
+        a.removeAttribute('aria-current');
+        a.removeAttribute('data-show-ring');
+      }
+    }
+    activeLink = next;
+    // Only move the indicator to active if the user isn't currently hovering
+    if (!navContainer?.matches(':hover')) moveIndicatorTo(activeLink);
+  };
+
+  // ── First-paint pill positioning (avoid the empty-then-pop) ────────
+  // Add a one-shot CSS class so the first appearance fades in over 700ms
+  // rather than the snappier 450ms used for subsequent moves.
+  indicator?.classList.add('is-initial');
+  glow?.classList.add('is-initial');
+  requestAnimationFrame(() => {
+    // Default the pill to the first link until the observer fires
+    if (navLinks.length > 0 && !activeLink) moveIndicatorTo(navLinks[0]);
+  });
+  setTimeout(() => {
+    indicator?.classList.remove('is-initial');
+    glow?.classList.remove('is-initial');
+  }, 800);
+
+  if (sections.size > 0) {
+    const visible = new Map<string, number>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.id;
+          if (entry.isIntersecting) visible.set(id, entry.intersectionRatio);
+          else visible.delete(id);
+        }
+        let bestId: string | null = null;
+        let bestRatio = -1;
+        for (const [id, ratio] of visible) {
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestId = id;
+          }
+        }
+        setActive(bestId);
+      },
+      {
+        rootMargin: '-80px 0px -55% 0px',
+        threshold: [0, 0.15, 0.35, 0.6, 0.85, 1],
+      }
+    );
+    for (const section of sections.values()) observer.observe(section);
+  }
+
+  // Hover-follow: pill tracks pointer across links
+  navLinks.forEach((a) => {
+    a.addEventListener('pointerenter', () => moveIndicatorTo(a));
+    a.addEventListener('focus', () => moveIndicatorTo(a));
+  });
+  navContainer?.addEventListener('pointerleave', () => moveIndicatorTo(activeLink));
+
+  // ── Magnetic micro-tilt on each link (toned down) ──────────────────
+  const MAGNET_STRENGTH = 0.10;
+  const MAGNET_MAX = 2; // px
+  navLinks.forEach((a) => {
+    a.addEventListener('pointermove', (e) => {
+      if ((e as PointerEvent).pointerType !== 'mouse') return;
+      const rect = a.getBoundingClientRect();
+      const dx = (e.clientX - (rect.left + rect.width / 2)) * MAGNET_STRENGTH;
+      const dy = (e.clientY - (rect.top + rect.height / 2)) * MAGNET_STRENGTH;
+      const cx = Math.max(-MAGNET_MAX, Math.min(MAGNET_MAX, dx));
+      const cy = Math.max(-MAGNET_MAX, Math.min(MAGNET_MAX, dy));
+      a.style.transform = `translate(${cx}px, ${cy}px)`;
+    });
+    a.addEventListener('pointerleave', () => {
+      a.style.transform = 'translate(0, 0)';
+    });
+  });
+
+  // Reposition indicator on resize
+  let resizeRaf = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(() => moveIndicatorTo(activeLink));
+  });
+</script>

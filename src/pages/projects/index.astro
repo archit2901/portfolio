@@ -1,0 +1,131 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import ProjectCard from '~/components/projects/ProjectCard.astro';
+import ProjectsRuntime from '~/components/projects/ProjectsRuntime.astro';
+import { site } from '~/content/site';
+
+const { projects } = site;
+const all = projects.items;
+const totalAll = all.length;
+
+// Counts per category for the filter chips
+const countByCategory: Record<string, number> = {};
+for (const item of all) {
+  countByCategory[item.category] = (countByCategory[item.category] ?? 0) + 1;
+}
+
+const pageTitle = `${site.name} — Projects`;
+const pageDescription = `${all.length} projects from Archit Gupta — full-stack engineering, AI tools, and creative coding.`;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section
+    data-visible="false"
+    class="projects-page relative isolate overflow-hidden px-5 sm:px-8 py-16 md:py-24 mx-auto w-full max-w-container"
+  >
+    {/* Atmospheric backdrop */}
+    <div class="pj-grid" aria-hidden="true"></div>
+    <div class="pj-blob" aria-hidden="true"></div>
+
+    {/* Back to home */}
+    <p data-reveal="0" class="reveal">
+      <a
+        href="/"
+        class="back-link group inline-flex items-center gap-1.5 font-mono text-[12px] text-text-faint hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
+      >
+        <span class="back-arrow" aria-hidden="true">←</span>
+        <span>Back to home</span>
+      </a>
+    </p>
+
+    {/* Section label */}
+    <p
+      data-reveal="1"
+      class="reveal font-mono text-xs text-text-faint tracking-wider mt-8 mb-4"
+    >
+      <span class="text-accent/80">{projects.sectionLabel.split('·')[0].trim()}</span>
+      <span class="mx-1.5 text-text-faint/70">·</span>
+      <span>{projects.sectionLabel.split('·')[1]?.trim() ?? 'Projects'}</span>
+    </p>
+
+    {/* Heading + underline */}
+    <h1
+      data-reveal="2"
+      class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
+    >
+      {projects.pageHeading}
+    </h1>
+    <span data-reveal="3" class="reveal pj-underline" aria-hidden="true"></span>
+
+    {/* Filter chips */}
+    <div
+      data-reveal="4"
+      class="reveal mt-10 flex flex-wrap items-center gap-2"
+      role="tablist"
+      aria-label="Filter projects by category"
+    >
+      <button type="button" data-pj-filter="all" data-active="true" class="pj-chip">
+        All <span class="text-text-faint/60 ml-1">{totalAll}</span>
+      </button>
+      {
+        projects.categories.map((c) => (
+          <button type="button" data-pj-filter={c.key} data-active="false" class="pj-chip">
+            {c.title} <span class="text-text-faint/60 ml-1">{countByCategory[c.key] ?? 0}</span>
+          </button>
+        ))
+      }
+    </div>
+
+    {/* Full project grid */}
+    <ul class="mt-5 md:mt-6 list-none p-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+      {
+        all.map((p, i) => (
+          <ProjectCard project={p} index={i} total={totalAll} staggerIndex={i} />
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<ProjectsRuntime />
+
+<style is:global>
+  /* Filter chip styles + back-link arrow micro-anim (kept page-local). */
+  .pj-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    color: #9ca3af;
+    background-color: rgba(17, 17, 17, 0.4);
+    border: 1px solid #222222;
+    transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease;
+    cursor: pointer;
+  }
+  .pj-chip:hover {
+    color: #ededed;
+    border-color: rgba(34, 211, 238, 0.35);
+  }
+  .pj-chip[data-active='true'] {
+    color: #22d3ee;
+    background-color: rgba(34, 211, 238, 0.08);
+    border-color: rgba(34, 211, 238, 0.45);
+  }
+  .pj-chip:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.7), 0 0 0 4px #0a0a0a;
+  }
+
+  .back-arrow {
+    display: inline-block;
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .back-link:hover .back-arrow {
+    transform: translateX(-3px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .back-arrow { transition: none; transform: none !important; }
+  }
+</style>

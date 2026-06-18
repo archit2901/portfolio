@@ -1,0 +1,48 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/hero/Hero.astro';
+import About from '~/components/about/About.astro';
+import Experience from '~/components/experience/Experience.astro';
+import Skills from '~/components/skills/Skills.astro';
+import Projects from '~/components/projects/Projects.astro';
+import Education from '~/components/education/Education.astro';
+import FAQ from '~/components/faq/FAQ.astro';
+import Contact from '~/components/contact/Contact.astro';
+import { site } from '~/content/site';
+
+// Stubs for sections still to come — keeps navbar anchors valid.
+// Anything already implemented as a real component is excluded here.
+const builtAnchors = new Set(['about', 'experience', 'skills', 'projects', 'education', 'faq', 'contact']);
+const placeholderSections = site.nav.links
+  .filter((l) => l.href.startsWith('#'))
+  .map((l) => ({ id: l.href.slice(1), label: l.label }))
+  .filter((s) => !builtAnchors.has(s.id));
+---
+
+<BaseLayout>
+  <Hero />
+  <About />
+  <Experience />
+  <Skills />
+  <Projects />
+  <Education />
+  <FAQ />
+  <Contact />
+
+  {
+    placeholderSections.map((s) => (
+      <section
+        id={s.id}
+        class="border-t border-border-subtle/60 px-5 sm:px-8 py-24 mx-auto w-full max-w-container"
+      >
+        <p class="font-mono text-xs text-text-faint">// {s.id}.tsx</p>
+        <h2 class="mt-2 text-3xl font-semibold tracking-tight text-text-primary capitalize">
+          {s.label}
+        </h2>
+        <p class="mt-4 text-text-muted max-w-prose">
+          Coming soon. This section is a placeholder anchor so navbar links resolve during development.
+        </p>
+      </section>
+    ))
+  }
+</BaseLayout>

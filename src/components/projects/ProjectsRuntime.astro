@@ -1,0 +1,261 @@
+---
+// Shared runtime for the Projects section + /projects page:
+//   • Global pj-* styles (backdrop, underline, reveal cascade, card tilt,
+//     layered z-depth, cursor spotlight, filter dim state, reduced-motion).
+//   • Single inline <script> that wires the IntersectionObserver,
+//     tilt/magnet/spotlight handlers, parallax, and filter-chip behaviour.
+//
+// Render <ProjectsRuntime /> exactly once per page that uses ProjectCard —
+// once at the bottom of <Projects /> (landing) and once at the bottom of
+// /projects/index.astro.
+---
+
+<style is:global>
+  /* Atmospheric backdrop */
+  .pj-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.10) 1px, transparent 0);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 25%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 25%, transparent 80%);
+  }
+  .pj-blob {
+    position: absolute;
+    z-index: -1;
+    top: -120px;
+    left: -120px;
+    width: 540px;
+    height: 540px;
+    border-radius: 9999px;
+    background: conic-gradient(from 60deg, rgba(34,211,238,0.18), rgba(168,85,247,0.18), rgba(244,63,94,0.14), rgba(34,211,238,0.18));
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Heading underline */
+  .pj-underline {
+    display: block;
+    margin-top: 18px;
+    height: 2px;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #22d3ee, #a855f7);
+    transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;
+    will-change: width;
+  }
+  .projects-section[data-visible='true'] .pj-underline,
+  .projects-page[data-visible='true']    .pj-underline { width: 120px; }
+
+  /* Reveal cascade — indexed delays for header items */
+  .projects-section .reveal,
+  .projects-page .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .projects-section[data-visible='true'] .reveal,
+  .projects-page[data-visible='true']    .reveal { opacity: 1; transform: translateY(0); }
+
+  .projects-section[data-visible='true'] .reveal[data-reveal='0'],
+  .projects-page[data-visible='true']    .reveal[data-reveal='0'] { transition-delay:   0ms; }
+  .projects-section[data-visible='true'] .reveal[data-reveal='1'],
+  .projects-page[data-visible='true']    .reveal[data-reveal='1'] { transition-delay:  90ms; }
+  .projects-section[data-visible='true'] .reveal[data-reveal='2'],
+  .projects-page[data-visible='true']    .reveal[data-reveal='2'] { transition-delay: 160ms; }
+  .projects-section[data-visible='true'] .reveal[data-reveal='3'],
+  .projects-page[data-visible='true']    .reveal[data-reveal='3'] { transition-delay: 280ms; }
+  .projects-section[data-visible='true'] .reveal[data-reveal='4'],
+  .projects-page[data-visible='true']    .reveal[data-reveal='4'] { transition-delay: 360ms; }
+  .projects-section[data-visible='true'] .reveal[data-reveal='5'],
+  .projects-page[data-visible='true']    .reveal[data-reveal='5'] { transition-delay: 440ms; }
+  .projects-section[data-visible='true'] .reveal[data-reveal='6'],
+  .projects-page[data-visible='true']    .reveal[data-reveal='6'] { transition-delay: 540ms; }
+
+  /* Card stagger — variable-driven so any number of cards work without
+     extra CSS rules. Used by .pj-cell on the /projects page. */
+  .projects-page[data-visible='true'] .pj-cell.reveal {
+    transition-delay: calc(540ms + var(--reveal-i, 0) * 70ms);
+  }
+
+  /* 3D tilt on cards */
+  .pj-cell { perspective: 1100px; }
+  .pj-card-inner {
+    transform-style: preserve-3d;
+    transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .pj-card:hover .pj-card-inner {
+    transition-duration: 120ms;
+  }
+
+  /* Layered z-depth so the tilt becomes a real scene */
+  .pj-layer-title   { transform: translateZ(26px); }
+  .pj-layer-desc    { transform: translateZ(14px); }
+  .pj-layer-chips   { transform: translateZ(10px); transform-style: preserve-3d; }
+  .pj-layer-actions { transform: translateZ(20px); }
+  .pj-index         { transform: translateZ(32px); z-index: 2; }
+
+  /* Cursor-tracking spotlight */
+  .pj-spotlight {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 220ms ease;
+    background: radial-gradient(
+      360px circle at var(--pj-mx, 50%) var(--pj-my, 50%),
+      var(--pj-color, rgba(34, 211, 238, 0.18)),
+      transparent 50%
+    );
+  }
+  .pj-card:hover .pj-spotlight,
+  .pj-card:focus-within .pj-spotlight { opacity: 1; }
+  .pj-card[data-accent='cyan']   { --pj-color: rgba(34,  211, 238, 0.20); }
+  .pj-card[data-accent='amber']  { --pj-color: rgba(251, 191, 36,  0.18); }
+  .pj-card[data-accent='rose']   { --pj-color: rgba(244, 63,  94,  0.18); }
+  .pj-card[data-accent='violet'] { --pj-color: rgba(168, 85,  247, 0.20); }
+
+  /* Filter dim state (used on /projects page) */
+  .pj-cell[data-dimmed='true'] .pj-card {
+    opacity: 0.28;
+    filter: saturate(0.5);
+  }
+  .pj-cell[data-dimmed='true'] .pj-card:hover {
+    opacity: 0.55;
+  }
+
+  /* ── Mobile-only collapse for project card body ─────────────── */
+  .pj-collapse-summary { list-style: none; }
+  .pj-collapse-summary::-webkit-details-marker { display: none; }
+  .pj-collapse[open] .pj-chevron { transform: rotate(180deg); }
+  .pj-collapse-label-open { display: none; }
+  .pj-collapse[open] .pj-collapse-label-closed { display: none; }
+  .pj-collapse[open] .pj-collapse-label-open { display: inline; }
+  @media (min-width: 768px) {
+    .pj-collapse > .pj-collapse-content { display: block !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .projects-section .reveal,
+    .projects-page .reveal { opacity: 1; transform: none; transition: none; }
+    .pj-underline { width: 120px; transition: none; }
+    .pj-card-inner { transform: none !important; transition: none; }
+    .pj-spotlight { display: none; }
+    .pj-layer-title, .pj-layer-desc, .pj-layer-chips, .pj-layer-actions, .pj-index {
+      transform: none !important;
+    }
+    .pj-grid, .pj-blob { transform: none !important; }
+    .pj-chevron { transition: none; }
+  }
+</style>
+
+<script>
+  // Shared runtime: section reveal, tilt + magnet + spotlight, parallax,
+  // and filter chips. Runs once per page (whichever .projects-* wrapper exists).
+  type Ctx = HTMLElement;
+
+  function init(ctx: Ctx) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).dataset.visible = 'true';
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0.05 }
+    );
+    io.observe(ctx);
+
+    // ── Mobile-only card body collapse: keep <details> open on md+ ──
+    const collapses = ctx.querySelectorAll<HTMLDetailsElement>('[data-mobile-collapse]');
+    const collapseMq = matchMedia('(min-width: 768px)');
+    const applyCollapse = () => {
+      const desktop = collapseMq.matches;
+      collapses.forEach((d) => {
+        if (desktop) d.open = true;
+        else if (!d.dataset.touched) d.open = false;
+      });
+    };
+    collapses.forEach((d) => {
+      d.addEventListener('toggle', () => {
+        if (!collapseMq.matches) d.dataset.touched = 'true';
+      });
+    });
+    applyCollapse();
+    collapseMq.addEventListener('change', () => {
+      collapses.forEach((d) => delete d.dataset.touched);
+      applyCollapse();
+    });
+
+    const TILT_MAX = 5;
+    const MAG_STRENGTH = 0.05;
+    const MAG_MAX = 2;
+    ctx.querySelectorAll<HTMLElement>('[data-tilt]').forEach((card) => {
+      const inner = card.querySelector<HTMLElement>('.pj-card-inner');
+      card.addEventListener('pointermove', (e) => {
+        if ((e as PointerEvent).pointerType !== 'mouse') return;
+        const rect = card.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width;
+        const py = (e.clientY - rect.top) / rect.height;
+        const ry = (px - 0.5) * 2 * TILT_MAX;
+        const rx = -(py - 0.5) * 2 * TILT_MAX;
+        if (inner) inner.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+        card.style.setProperty('--pj-mx', `${(px * 100).toFixed(1)}%`);
+        card.style.setProperty('--pj-my', `${(py * 100).toFixed(1)}%`);
+        const dx = (e.clientX - (rect.left + rect.width / 2)) * MAG_STRENGTH;
+        const dy = (e.clientY - (rect.top + rect.height / 2)) * MAG_STRENGTH;
+        const cx = Math.max(-MAG_MAX, Math.min(MAG_MAX, dx));
+        const cy = Math.max(-MAG_MAX, Math.min(MAG_MAX, dy));
+        card.style.transform = `translate(${cx}px, ${cy}px)`;
+      });
+      card.addEventListener('pointerleave', () => {
+        if (inner) inner.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        card.style.transform = 'translate(0, 0)';
+      });
+    });
+
+    const grid = ctx.querySelector<HTMLElement>('.pj-grid');
+    const blob = ctx.querySelector<HTMLElement>('.pj-blob');
+    if ((grid || blob) && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      let raf = 0;
+      const onScroll = () => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          const rect = ctx.getBoundingClientRect();
+          const vh = window.innerHeight || 1;
+          const progress = (vh - rect.top) / (vh + rect.height);
+          const clamped = Math.max(-0.5, Math.min(1.5, progress));
+          if (grid) grid.style.transform = `translateY(${(-clamped * 40).toFixed(1)}px)`;
+          if (blob) blob.style.transform = `translateY(${(clamped * 25).toFixed(1)}px)`;
+        });
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    // Filter chips (only present on /projects page)
+    const chips = ctx.querySelectorAll<HTMLButtonElement>('[data-pj-filter]');
+    const cells = ctx.querySelectorAll<HTMLElement>('[data-category]');
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const f = chip.getAttribute('data-pj-filter') ?? 'all';
+        chips.forEach((c) => c.setAttribute('data-active', String(c === chip)));
+        cells.forEach((cell) => {
+          const cat = cell.getAttribute('data-category');
+          const match = f === 'all' || cat === f;
+          cell.setAttribute('data-dimmed', String(!match));
+        });
+      });
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('.projects-section, .projects-page').forEach(init);
+</script>

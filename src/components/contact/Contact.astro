@@ -1,5 +1,6 @@
 ---
 import { site } from '~/content/site';
+import AnchorLink from '~/components/AnchorLink.astro';
 
 const { contact } = site;
 
@@ -66,7 +67,8 @@ const ACTION_VERB: Record<string, string> = {
     data-reveal="1"
     class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
   >
-    {contact.heading}
+    <span>{contact.heading}</span>
+    <AnchorLink for="contact" />
   </h2>
   <span data-reveal="2" class="reveal ct-underline" aria-hidden="true"></span>
 

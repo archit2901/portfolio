@@ -1,0 +1,99 @@
+---
+/**
+ * First-visit pro-tip toast. Slides up from the bottom-right ~2s after page
+ * load, dismisses automatically after 10s or on user click. localStorage flag
+ * prevents re-show across visits. Different copy on mobile (no ⌘K there).
+ */
+---
+
+<div
+  id="onboarding-toast"
+  data-state="hidden"
+  role="status"
+  aria-live="polite"
+  class="ob-toast pointer-events-none fixed bottom-5 right-5 z-[55] max-w-[calc(100vw-2.5rem)]
+         opacity-0 translate-y-4 transition-[opacity,transform] duration-400 ease-out
+         data-[state=shown]:opacity-100 data-[state=shown]:translate-y-0
+         data-[state=shown]:pointer-events-auto"
+>
+  <div class="relative flex items-start gap-3 rounded-xl border border-border-subtle bg-bg-subtle/80 backdrop-blur-md px-4 py-3 shadow-[0_18px_40px_-20px_rgba(0,0,0,0.7)] min-w-[260px]">
+    <span class="mt-1 block w-2 h-2 rounded-full bg-accent wordmark-dot shrink-0" aria-hidden="true"></span>
+
+    <div class="flex-1 min-w-0">
+      <p class="font-mono text-[10px] text-accent uppercase tracking-[0.18em]">Pro tip</p>
+      <p class="mt-0.5 text-[13px] text-text-primary">
+        <span class="ob-tip-desktop">
+          Press <kbd class="inline-flex items-center px-1.5 py-0.5 mx-0.5 rounded text-[10px] font-mono text-text-muted border border-border-subtle/80 bg-bg-base/60">⌘K</kbd> to navigate quickly.
+        </span>
+        <span class="ob-tip-mobile">Tap the menu icon to navigate quickly.</span>
+      </p>
+      <div class="mt-2.5 flex items-center gap-3">
+        <button
+          id="onboarding-ack"
+          type="button"
+          class="font-mono text-[11px] text-accent hover:text-accent-warm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
+        >Got it</button>
+      </div>
+    </div>
+
+    <button
+      id="onboarding-close"
+      type="button"
+      aria-label="Dismiss tip"
+      class="shrink-0 -mr-1 -mt-1 inline-flex items-center justify-center w-6 h-6 rounded text-text-faint hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" style="display:block">
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style is:global>
+  /* Mobile vs desktop copy swap */
+  @media (hover: none) and (pointer: coarse) {
+    .ob-tip-desktop { display: none; }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ob-tip-mobile { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ob-toast { transition: opacity 200ms linear; transform: none !important; }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const KEY = 'seen-cmdk-tip';
+    let dismissed = false;
+    try { dismissed = localStorage.getItem(KEY) === '1'; } catch (_) {}
+    if (dismissed) return;
+
+    const toast = document.getElementById('onboarding-toast');
+    const ack   = document.getElementById('onboarding-ack');
+    const close = document.getElementById('onboarding-close');
+    if (!toast) return;
+
+    const dismiss = () => {
+      toast.setAttribute('data-state', 'hidden');
+      try { localStorage.setItem(KEY, '1'); } catch (_) {}
+      // Remove after the transition finishes to keep the DOM clean.
+      setTimeout(() => toast.remove(), 500);
+      clearTimeout(autoTimer);
+    };
+
+    ack?.addEventListener('click', dismiss);
+    close?.addEventListener('click', dismiss);
+
+    // Auto-dismiss after 10s of visibility
+    let autoTimer = 0;
+
+    // Show after ~2s so it doesn't compete with hero entrance animation
+    setTimeout(() => {
+      toast.setAttribute('data-state', 'shown');
+      autoTimer = window.setTimeout(dismiss, 10000);
+    }, 2000);
+  })();
+</script>

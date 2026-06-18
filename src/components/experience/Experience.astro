@@ -1,5 +1,6 @@
 ---
 import { site } from '~/content/site';
+import AnchorLink from '~/components/AnchorLink.astro';
 
 const { experience } = site;
 
@@ -74,7 +75,8 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
     data-reveal="1"
     class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
   >
-    {experience.heading}
+    <span>{experience.heading}</span>
+    <AnchorLink for="experience" />
   </h2>
   <span data-reveal="2" class="reveal exp-underline" aria-hidden="true"></span>
 

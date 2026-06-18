@@ -2,6 +2,7 @@
 import { site } from '~/content/site';
 import ProjectCard from './ProjectCard.astro';
 import ProjectsRuntime from './ProjectsRuntime.astro';
+import AnchorLink from '~/components/AnchorLink.astro';
 
 const { projects } = site;
 const featured = projects.items.filter((p) => p.featured).slice(0, 3);
@@ -31,7 +32,8 @@ const featured = projects.items.filter((p) => p.featured).slice(0, 3);
     data-reveal="1"
     class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
   >
-    {projects.landingHeading}
+    <span>{projects.landingHeading}</span>
+    <AnchorLink for="projects" />
   </h2>
   <span data-reveal="2" class="reveal pj-underline" aria-hidden="true"></span>
 

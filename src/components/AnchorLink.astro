@@ -1,0 +1,47 @@
+---
+/**
+ * Hoverable `#` anchor button. Sits next to a section heading.
+ *
+ * Click → copies `https://<site>/#<targetId>` to clipboard + shows a global
+ * toast for ~1.4s (the toast and its JS handler live once in BaseLayout).
+ *
+ * Usage:  <AnchorLink for="about" />
+ */
+interface Props {
+  /** Section id (without the leading `#`). */
+  for: string;
+}
+const { for: target } = Astro.props;
+---
+
+<a
+  href={`#${target}`}
+  data-anchor-copy
+  data-anchor-target={target}
+  aria-label={`Copy link to ${target} section`}
+  class="anchor-link group relative inline-flex items-center justify-center w-7 h-7 -ml-1 align-middle rounded text-text-faint/0 hover:text-accent focus-visible:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
+    <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+    <path d="M15 7h2a5 5 0 0 1 0 10h-2"/>
+    <line x1="8" y1="12" x2="16" y2="12"/>
+  </svg>
+</a>
+
+<style is:global>
+  /* Visible when its containing heading is hovered, focused-within, or on touch */
+  h1:hover .anchor-link,
+  h2:hover .anchor-link,
+  h3:hover .anchor-link,
+  h1:focus-within .anchor-link,
+  h2:focus-within .anchor-link,
+  h3:focus-within .anchor-link {
+    color: rgb(34 211 238 / 0.65);
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .anchor-link { color: rgb(107 114 128 / 0.5); }
+  }
+  .anchor-link.copied {
+    color: rgb(34 211 238) !important;
+  }
+</style>

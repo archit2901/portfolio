@@ -1,0 +1,132 @@
+---
+/**
+ * Decorative cursor layer for fine-pointer (desktop) devices only.
+ *
+ * Two concentric elements:
+ *   .cc-dot  — small solid cyan dot, follows the pointer 1:1
+ *   .cc-ring — larger outline ring, follows with a tiny lag + scales up on
+ *              hover over interactive elements (`a`, `button`, `[role=button]`,
+ *              `[data-tilt]`, `summary`, `.faq-card`, etc.)
+ *
+ * The native browser cursor stays available. This is a layer, not a
+ * replacement — keeps accessibility intact (text selection, link tooltips,
+ * keyboard focus rings all unaffected).
+ */
+---
+
+<div id="cc-root" class="cc-root" aria-hidden="true">
+  <span class="cc-ring"></span>
+  <span class="cc-dot"></span>
+</div>
+
+<style is:global>
+  /* Desktop only */
+  .cc-root {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 70;
+    mix-blend-mode: difference;
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cc-root { display: block; }
+  }
+  .cc-dot,
+  .cc-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 9999px;
+    will-change: transform;
+    pointer-events: none;
+  }
+  .cc-dot {
+    width: 6px;
+    height: 6px;
+    background: #67e8f9;
+    transform: translate3d(-50%, -50%, 0);
+    transition: transform 60ms linear, opacity 200ms ease;
+    opacity: 0;
+  }
+  .cc-ring {
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid rgba(103, 232, 249, 0.55);
+    transform: translate3d(-50%, -50%, 0) scale(1);
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 200ms ease,
+                width 180ms ease, height 180ms ease;
+    opacity: 0;
+  }
+  .cc-root[data-active='true'] .cc-dot,
+  .cc-root[data-active='true'] .cc-ring { opacity: 1; }
+  .cc-root[data-hovering='true'] .cc-ring {
+    transform: translate3d(-50%, -50%, 0) scale(1.6);
+    border-color: rgba(103, 232, 249, 0.85);
+  }
+  .cc-root[data-pressed='true'] .cc-ring {
+    transform: translate3d(-50%, -50%, 0) scale(0.85);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-ring { transition: opacity 200ms ease; }
+    .cc-root[data-hovering='true'] .cc-ring { transform: translate3d(-50%, -50%, 0) scale(1.4); }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const root = document.getElementById('cc-root');
+    if (!root) return;
+    // Bail out on touch
+    if (matchMedia('(hover: none), (pointer: coarse)').matches) return;
+
+    const dot = root.querySelector('.cc-dot');
+    const ring = root.querySelector('.cc-ring');
+    if (!dot || !ring) return;
+
+    let dotX = 0, dotY = 0;
+    let ringX = 0, ringY = 0;
+    let targetX = 0, targetY = 0;
+    let raf = 0;
+
+    const tick = () => {
+      // Dot snaps to cursor; ring trails with simple lerp for that liquid feel
+      dotX = targetX;
+      dotY = targetY;
+      ringX += (targetX - ringX) * 0.22;
+      ringY += (targetY - ringY) * 0.22;
+      dot.style.transform = `translate3d(${dotX}px, ${dotY}px, 0) translate(-50%, -50%)`;
+      ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) var(--cc-scale, scale(1))`;
+      raf = requestAnimationFrame(tick);
+    };
+
+    const INTERACTIVE_SELECTOR =
+      'a, button, [role="button"], summary, input, textarea, select, [data-tilt], [data-magnet], .faq-card, .pj-card, .sk-card, .ct-tile, .ct-email-card, kbd';
+
+    window.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      targetX = e.clientX;
+      targetY = e.clientY;
+      root.dataset.active = 'true';
+      if (!raf) raf = requestAnimationFrame(tick);
+      // Quick hover-state check
+      const t = e.target instanceof Element ? e.target : null;
+      const interactive = !!(t && t.closest(INTERACTIVE_SELECTOR));
+      root.dataset.hovering = String(interactive);
+    });
+
+    window.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      root.dataset.pressed = 'true';
+    });
+    window.addEventListener('pointerup', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      root.dataset.pressed = 'false';
+    });
+    window.addEventListener('mouseleave', () => {
+      root.dataset.active = 'false';
+    });
+  })();
+</script>

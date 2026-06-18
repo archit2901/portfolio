@@ -492,6 +492,15 @@ const links = site.nav.links.map((l) => ({
     activeLink = next;
     // Only move the indicator to active if the user isn't currently hovering
     if (!navContainer?.matches(':hover')) moveIndicatorTo(activeLink);
+
+    // Silently sync the URL hash so visitors can copy a deep link from the
+    // address bar without us pushing browser-history entries.
+    if (id && window.location.pathname === '/') {
+      const wanted = '#' + id;
+      if (window.location.hash !== wanted) {
+        try { history.replaceState(null, '', wanted); } catch (_) {}
+      }
+    }
   };
 
   // ── First-paint pill positioning (avoid the empty-then-pop) ────────

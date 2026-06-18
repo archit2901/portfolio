@@ -1,5 +1,7 @@
 ---
 import { site } from '~/content/site';
+import AnchorLink from '~/components/AnchorLink.astro';
+import { PORTRAIT_LQIP } from '~/content/portrait-lqip';
 
 const { about, name: ownerName } = site;
 const avatarCaption = about.avatarCaption || 'Boston, MA · ET';
@@ -39,8 +41,9 @@ const avatarCaption = about.avatarCaption || 'Boston, MA · ET';
         height="280"
         loading="lazy"
         decoding="async"
-        class="relative block w-[140px] h-[140px] rounded-full object-cover border border-border-strong ring-1 ring-white/[0.06]"
-        style="object-position: 50% 15%;"
+        data-portrait-img
+        class="portrait-img relative block w-[140px] h-[140px] rounded-full object-cover border border-border-strong ring-1 ring-white/[0.06]"
+        style={`object-position: 50% 15%; background-image: url(${PORTRAIT_LQIP}); background-size: cover; background-position: 50% 15%;`}
       />
       {/* Breathing presence dot */}
       <span
@@ -59,7 +62,8 @@ const avatarCaption = about.avatarCaption || 'Boston, MA · ET';
     data-reveal="1"
     class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
   >
-    {about.heading}
+    <span>{about.heading}</span>
+    <AnchorLink for="about" />
   </h2>
   <span data-reveal="2" class="reveal about-underline" aria-hidden="true"></span>
 
@@ -156,7 +160,9 @@ const avatarCaption = about.avatarCaption || 'Boston, MA · ET';
             height="640"
             loading="lazy"
             decoding="async"
-            class="block w-full h-auto aspect-[3/4] object-cover"
+            data-portrait-img
+            class="portrait-img block w-full h-auto aspect-[3/4] object-cover"
+            style={`background-image: url(${PORTRAIT_LQIP}); background-size: cover;`}
           />
           {/* Cursor-tracking shine */}
           <div class="portrait-shine pointer-events-none absolute inset-0" aria-hidden="true"></div>
@@ -286,6 +292,15 @@ const avatarCaption = about.avatarCaption || 'Boston, MA · ET';
   }
 
   /* ── Reduced motion gates ────────────────────────────────────────── */
+  /* Portrait LQIP crossfade — placeholder visible until the real <img> finishes loading */
+  .portrait-img {
+    opacity: 0;
+    transition: opacity 400ms ease-out;
+  }
+  .portrait-img[data-loaded='true'] {
+    opacity: 1;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
     .about-underline { width: 120px; transition: none; }
@@ -293,6 +308,7 @@ const avatarCaption = about.avatarCaption || 'Boston, MA · ET';
     .portrait-shine { display: none; }
     .about-grid { transform: none !important; }
     .about-chevron { transition: none; }
+    .portrait-img { transition: opacity 150ms linear; }
   }
 </style>
 
@@ -401,4 +417,13 @@ const avatarCaption = about.avatarCaption || 'Boston, MA · ET';
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   }
+
+  // ── LQIP crossfade: mark each portrait image once it's done loading ──
+  document.querySelectorAll<HTMLImageElement>('[data-portrait-img]').forEach((img) => {
+    if (img.complete && img.naturalWidth > 0) {
+      img.dataset.loaded = 'true';
+    } else {
+      img.addEventListener('load', () => { img.dataset.loaded = 'true'; }, { once: true });
+    }
+  });
 </script>

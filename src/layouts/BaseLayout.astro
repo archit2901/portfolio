@@ -4,6 +4,8 @@ import Analytics from '@vercel/analytics/astro';
 import Navbar from '~/components/Navbar.astro';
 import Footer from '~/components/Footer.astro';
 import CommandPalette from '~/components/command/CommandPalette.astro';
+import OnboardingToast from '~/components/OnboardingToast.astro';
+import CustomCursor from '~/components/CustomCursor.astro';
 import { site } from '~/content/site';
 
 interface Props {
@@ -86,6 +88,26 @@ const personSchema = {
     </main>
     <Footer />
     <CommandPalette />
+    <OnboardingToast />
+    <CustomCursor />
+
+    {/* Anchor-copy toast — shared across every <AnchorLink> on the page */}
+    <div
+      id="anchor-toast"
+      role="status"
+      aria-live="polite"
+      data-state="hidden"
+      class="anchor-toast pointer-events-none fixed bottom-5 left-1/2 -translate-x-1/2 z-[58]
+             flex items-center gap-2 px-3.5 py-2 rounded-full border border-accent/40 bg-bg-subtle/85 backdrop-blur-md
+             font-mono text-[12px] text-accent
+             opacity-0 translate-y-2 transition-[opacity,transform] duration-200 ease-out
+             data-[state=shown]:opacity-100 data-[state=shown]:translate-y-0"
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>Link copied</span>
+    </div>
 
     {/* Privacy-friendly pageview analytics (Vercel Web Analytics) */}
     <Analytics />
@@ -101,6 +123,100 @@ const personSchema = {
         console.log('%csite source: %chttps://github.com/archit2901/portfolio', body, link);
         console.log('%cbuilt with: %castro 5 · tailwind · three.js', body, link);
         console.log('%cpress %c⌘K%c to navigate', body, kbd, body);
+      })();
+    </script>
+
+    {/* Anchor-copy click handler — shared across all <AnchorLink> instances */}
+    <script is:inline>
+      (() => {
+        const toast = document.getElementById('anchor-toast');
+        let hideTimer = 0;
+        const showToast = () => {
+          if (!toast) return;
+          toast.setAttribute('data-state', 'shown');
+          clearTimeout(hideTimer);
+          hideTimer = window.setTimeout(() => {
+            toast.setAttribute('data-state', 'hidden');
+          }, 1400);
+        };
+        const onClick = async (e) => {
+          const a = e.target instanceof Element ? e.target.closest('[data-anchor-copy]') : null;
+          if (!a) return;
+          e.preventDefault();
+          const target = a.getAttribute('data-anchor-target') || '';
+          const url = window.location.origin + window.location.pathname + '#' + target;
+          let ok = false;
+          try {
+            if (navigator.clipboard && window.isSecureContext) {
+              await navigator.clipboard.writeText(url);
+              ok = true;
+            }
+          } catch (_) {}
+          if (!ok) {
+            const ta = document.createElement('textarea');
+            ta.value = url;
+            ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); } catch (_) {}
+            ta.remove();
+          }
+          a.classList.add('copied');
+          setTimeout(() => a.classList.remove('copied'), 900);
+          // Update the URL hash silently so the visitor can re-copy from the bar.
+          try { history.replaceState(null, '', '#' + target); } catch (_) {}
+          showToast();
+        };
+        document.addEventListener('click', onClick);
+      })();
+    </script>
+
+    {/* Tab-title swap when the page becomes hidden */}
+    <script is:inline>
+      (() => {
+        const original = document.title;
+        const messages = ['👋 come back?', "Archit's still here."];
+        let timer = 0;
+        let i = 0;
+        const tick = () => {
+          if (document.visibilityState !== 'hidden') return;
+          document.title = messages[i % messages.length];
+          i += 1;
+          timer = window.setTimeout(tick, 3000);
+        };
+        document.addEventListener('visibilitychange', () => {
+          clearTimeout(timer);
+          i = 0;
+          if (document.visibilityState === 'hidden') {
+            timer = window.setTimeout(tick, 800);
+          } else {
+            document.title = original;
+          }
+        });
+      })();
+    </script>
+
+    {/* Scroll restoration on back navigation */}
+    <script is:inline>
+      (() => {
+        // Disable the browser's automatic guess so our explicit restore wins.
+        if ('scrollRestoration' in history) {
+          try { history.scrollRestoration = 'manual'; } catch (_) {}
+        }
+        const KEY = 'scroll:' + location.pathname;
+        const save = () => {
+          try { sessionStorage.setItem(KEY, String(window.scrollY)); } catch (_) {}
+        };
+        const restore = () => {
+          let y = 0;
+          try { y = parseInt(sessionStorage.getItem(KEY) || '0', 10); } catch (_) {}
+          if (y > 0) {
+            // Defer past the post-load paint so layout is settled.
+            requestAnimationFrame(() => window.scrollTo(0, y));
+          }
+        };
+        window.addEventListener('pageshow', restore);
+        window.addEventListener('beforeunload', save);
+        window.addEventListener('pagehide', save);
       })();
     </script>
 

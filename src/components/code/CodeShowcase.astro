@@ -1,0 +1,255 @@
+---
+/**
+ * "Code I'm proud of" homepage section. One annotated, syntax-highlighted
+ * Go snippet from the url-shortener service — the cache-aside redirect path.
+ *
+ * Why this exists: roughly one-in-three hiring managers won't click out
+ * to GitHub during their first read. This puts real production code on
+ * the portfolio itself so code quality is provable without leaving the page.
+ *
+ * Highlighting is done at build time via Astro's built-in Shiki integration
+ * (the <Code> component). Zero JS at runtime; output is static HTML.
+ */
+import { Code } from 'astro:components';
+
+const snippet = `// Resolve looks up a short code and returns the long URL.
+// Cache-aside on the redirect hot path: Redis hit ~1ms, cold path ~5ms via pgx.
+func (s *URLService) Resolve(ctx context.Context, shortCode string, clickCtx *ClickContext) (string, error) {
+    span := sentry.StartSpan(ctx, "service.resolve")
+    defer span.Finish()
+
+    var longURL string
+    var urlID int64
+
+    // Fast path — Redis. Click metadata still needs the row id so we
+    // do a lightweight lookup only when a recorder is attached.
+    cached, err := s.cache.Get(ctx, shortCode)
+    if err == nil {
+        longURL = cached
+        span.SetTag("cache.hit", "true")
+        if clickCtx != nil && s.recorder != nil {
+            if u, lookupErr := s.repo.GetByShortCode(ctx, shortCode); lookupErr == nil {
+                urlID = u.ID
+            }
+        }
+    } else {
+        // Cold path — Postgres + warm the cache on the way back.
+        // Graceful degradation: a Redis hiccup still serves the redirect.
+        span.SetTag("cache.hit", "false")
+        if !errors.Is(err, cache.ErrCacheMiss) {
+            s.log.Warn("cache get failed, falling back to db",
+                "short_code", shortCode, "error", err)
+        }
+        u, err := s.repo.GetByShortCode(ctx, shortCode)
+        if err != nil {
+            return "", err
+        }
+        longURL, urlID = u.LongURL, u.ID
+        _ = s.cache.Set(ctx, shortCode, u.LongURL) // best-effort warm
+    }
+
+    // Fire-and-forget click capture so the redirect isn't blocked.
+    if clickCtx != nil && s.recorder != nil {
+        s.recorder.Record(repository.Click{
+            URLID:     urlID,
+            IPHash:    hashIP(clickCtx.IP),
+            UserAgent: clickCtx.UserAgent,
+            Referrer:  clickCtx.Referrer,
+            ClickedAt: time.Now(),
+        })
+    }
+
+    return longURL, nil
+}`;
+---
+
+<section
+  id="code"
+  data-visible="false"
+  class="code-section relative isolate overflow-hidden border-t border-border-subtle/40 px-5 sm:px-8 py-16 sm:py-24 md:py-32 mx-auto w-full max-w-container"
+>
+  <div class="code-grid" aria-hidden="true"></div>
+  <div class="code-blob" aria-hidden="true"></div>
+
+  {/* Section label */}
+  <p
+    data-reveal="0"
+    class="reveal font-mono text-xs text-text-faint tracking-wider mb-4"
+  >
+    <span class="text-accent/80">→</span>
+    <span class="mx-1.5 text-text-faint/70">·</span>
+    <span>Code</span>
+  </p>
+
+  {/* Heading + underline */}
+  <h2
+    data-reveal="1"
+    class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
+  >
+    Code I'm proud of.
+  </h2>
+  <span data-reveal="2" class="reveal code-underline" aria-hidden="true"></span>
+
+  {/* Annotation */}
+  <p data-reveal="3" class="reveal mt-6 max-w-[64ch] text-text-muted leading-relaxed text-[14.5px] md:text-base">
+    The cache-aside redirect path from <a href="https://github.com/archit2901/url-shortener" target="_blank" rel="noopener noreferrer" class="text-text-primary hover:text-accent underline-offset-2 hover:underline transition-colors">url-shortener</a>.
+    Reads warm the Redis cache on the cold path, fail open if Redis hiccups,
+    and capture clicks asynchronously so the redirect itself stays fast.
+    Observability via Sentry spans on both legs.
+  </p>
+
+  {/* Snippet */}
+  <div
+    data-reveal="4"
+    class="reveal mt-6 md:mt-8 rounded-xl border border-border-subtle bg-bg-subtle/55 backdrop-blur-sm overflow-hidden"
+  >
+    {/* File header */}
+    <div class="flex items-center justify-between px-4 py-2.5 border-b border-border-subtle/70 bg-bg-base/40">
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="flex items-center gap-1 shrink-0" aria-hidden="true">
+          <span class="block w-2 h-2 rounded-full bg-traffic-red/80"></span>
+          <span class="block w-2 h-2 rounded-full bg-traffic-yellow/80"></span>
+          <span class="block w-2 h-2 rounded-full bg-traffic-green/80"></span>
+        </div>
+        <span class="font-mono text-[11px] text-text-faint truncate">
+          backend/internal/services/url_service.go
+        </span>
+      </div>
+      <span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[10px] text-accent/80 border border-accent/30 bg-accent/[0.05]">
+        Go
+      </span>
+    </div>
+
+    {/* Code body — Shiki output is static HTML */}
+    <div class="code-body overflow-x-auto">
+      <Code code={snippet} lang="go" theme="github-dark" />
+    </div>
+  </div>
+
+  {/* Footer links */}
+  <div
+    data-reveal="5"
+    class="reveal mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[12px]"
+  >
+    <a
+      href="https://github.com/archit2901/url-shortener/blob/main/backend/internal/services/url_service.go"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-1.5 text-text-muted hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
+    >
+      <span aria-hidden="true">↗</span>
+      <span>full source</span>
+    </a>
+    <span class="text-text-faint/60" aria-hidden="true">·</span>
+    <a
+      href="https://github.com/archit2901/url-shortener#architecture"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-1.5 text-text-muted hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
+    >
+      <span aria-hidden="true">↗</span>
+      <span>architecture notes</span>
+    </a>
+    <span class="text-text-faint/60" aria-hidden="true">·</span>
+    <a
+      href="https://github.com/archit2901/url-shortener"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-1.5 text-text-muted hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
+    >
+      <span aria-hidden="true">↗</span>
+      <span>repo</span>
+    </a>
+  </div>
+</section>
+
+<style is:global>
+  /* Atmospheric backdrop — fresh corner from neighbours */
+  .code-section .code-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.10) 1px, transparent 0);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 70% 60% at 70% 55%, #000 25%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 70% 55%, #000 25%, transparent 80%);
+  }
+  .code-section .code-blob {
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    right: -160px;
+    transform: translateY(-50%);
+    width: 540px;
+    height: 460px;
+    border-radius: 9999px;
+    background: conic-gradient(from 30deg, rgba(34,211,238,0.18), rgba(251,191,36,0.14), rgba(168,85,247,0.18), rgba(34,211,238,0.18));
+    filter: blur(70px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Heading underline */
+  .code-underline {
+    display: block;
+    margin-top: 18px;
+    height: 2px;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #22d3ee, #a855f7);
+    transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;
+    will-change: width;
+  }
+  .code-section[data-visible='true'] .code-underline { width: 120px; }
+
+  /* Reveal cascade */
+  .code-section .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .code-section[data-visible='true'] .reveal { opacity: 1; transform: translateY(0); }
+  .code-section[data-visible='true'] .reveal[data-reveal='0'] { transition-delay:   0ms; }
+  .code-section[data-visible='true'] .reveal[data-reveal='1'] { transition-delay:  90ms; }
+  .code-section[data-visible='true'] .reveal[data-reveal='2'] { transition-delay: 160ms; }
+  .code-section[data-visible='true'] .reveal[data-reveal='3'] { transition-delay: 240ms; }
+  .code-section[data-visible='true'] .reveal[data-reveal='4'] { transition-delay: 340ms; }
+  .code-section[data-visible='true'] .reveal[data-reveal='5'] { transition-delay: 480ms; }
+
+  /* Tune Shiki output to match the site */
+  .code-body pre {
+    margin: 0;
+    padding: 18px 20px;
+    background: transparent !important;
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  .code-body code {
+    font-family: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .code-section .reveal { opacity: 1; transform: none; transition: none; }
+    .code-underline { width: 120px; transition: none; }
+  }
+</style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('section#code.code-section');
+  if (section) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).dataset.visible = 'true';
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -15% 0px', threshold: 0.1 }
+    );
+    io.observe(section);
+  }
+</script>

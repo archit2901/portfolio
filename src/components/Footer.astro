@@ -5,6 +5,15 @@ const b = site.build;
 ---
 
 <footer class="relative mt-16 sm:mt-24 border-t border-border-subtle/50 px-5 sm:px-8 py-6 mx-auto w-full max-w-container">
+  {/* Recruiter-facing CTA above the build stamp */}
+  <p class="font-mono text-[11.5px] text-text-muted mb-2">
+    <span class="inline-flex items-center gap-1.5">
+      <span class="block w-1.5 h-1.5 rounded-full bg-accent wordmark-dot" aria-hidden="true"></span>
+      <span>Open to roles · Boston, ET</span>
+    </span>
+  </p>
+
+  {/* Build stamp */}
   <ul class="flex flex-wrap items-center gap-x-3 gap-y-1.5 list-none p-0 m-0 font-mono text-[11px] text-text-faint leading-relaxed">
     <li class="inline-flex items-center gap-1.5">
       <span class="text-accent/70 select-none" aria-hidden="true">$</span>
@@ -17,7 +26,7 @@ const b = site.build;
     <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>
     <li>{b.jsGzipKb}kb js (gz)</li>
     <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>
-    <li>last built {b.lastBuiltDate}</li>
+    <li>last updated {b.lastBuiltDate}</li>
     {b.repoUrl && (
       <>
         <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>

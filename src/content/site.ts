@@ -135,6 +135,9 @@ export const site = {
     /** Short caption shown beside the mobile-only circular avatar.
      *  Empty string hides the caption row; component falls back to a sane default. */
     avatarCaption: "Boston, MA · ET",
+    /** Tenure badge rendered above the bio. Spells out total years so recruiters
+     *  don't have to subtract dates themselves. Empty string hides the badge. */
+    tenureBadge: "3+ years of professional engineering · 2.5y at EY + ongoing co-op",
     /** Bento row of compact fact cards. */
     facts: [
       { label: "Based in",  value: "Boston, MA" },
@@ -678,8 +681,8 @@ export const site = {
   build: {
     version: "0.1.0",
     framework: "astro 5",
-    jsGzipKb: 119,
-    lastBuiltDate: "Jun 16 2026",
+    jsGzipKb: 121,
+    lastBuiltDate: "Jun 18 2026",
     repoUrl: "https://github.com/archit2901/portfolio",
   },
 

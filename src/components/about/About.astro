@@ -71,6 +71,17 @@ const avatarCaption = about.avatarCaption || 'Boston, MA · ET';
   <div class="mt-8 sm:mt-12 md:mt-16 grid md:grid-cols-[1.4fr_1fr] gap-10 lg:gap-14 items-start">
     {/* ── Left column: bio + tech ─────────────────────────────────── */}
     <div>
+      {/* Tenure badge — saves recruiters from subtracting dates */}
+      {about.tenureBadge && (
+        <p
+          data-reveal="3"
+          class="reveal mb-5 inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-accent/30 bg-accent/[0.05] font-mono text-[11.5px] text-accent w-fit"
+        >
+          <span class="block w-1.5 h-1.5 rounded-full bg-accent wordmark-dot" aria-hidden="true"></span>
+          <span>{about.tenureBadge}</span>
+        </p>
+      )}
+
       {about.intro && (
         <p
           data-reveal="3"

@@ -3,5 +3,13 @@
   "framework": "astro",
   "buildCommand": "astro build",
   "outputDirectory": "dist",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "redirects": [
+    { "source": "/cv",       "destination": "/resume.pdf",                       "permanent": false },
+    { "source": "/resume",   "destination": "/resume.pdf",                       "permanent": false },
+    { "source": "/gh",       "destination": "https://github.com/archit2901",     "permanent": false },
+    { "source": "/github",   "destination": "https://github.com/archit2901",     "permanent": false },
+    { "source": "/li",       "destination": "https://linkedin.com/in/archit2901","permanent": false },
+    { "source": "/linkedin", "destination": "https://linkedin.com/in/archit2901","permanent": false }
+  ]
 }

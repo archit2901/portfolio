@@ -1,0 +1,223 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { site } from '~/content/site';
+
+const { uses } = site;
+const pageTitle = `${site.name} — /uses`;
+const pageDescription = uses.lead;
+
+const ACCENT_DOT: Record<string, string> = {
+  cyan:   'bg-cyan-400',
+  amber:  'bg-amber-400',
+  rose:   'bg-rose-400',
+  violet: 'bg-violet-400',
+};
+const ACCENT_BAR: Record<string, string> = {
+  cyan:   'from-cyan-400/0 via-cyan-300/80 to-cyan-400/0',
+  amber:  'from-amber-400/0 via-amber-300/80 to-amber-400/0',
+  rose:   'from-rose-400/0 via-rose-300/80 to-rose-400/0',
+  violet: 'from-violet-400/0 via-fuchsia-300/80 to-violet-400/0',
+};
+const ACCENT_BORDER: Record<string, string> = {
+  cyan:   'hover:border-cyan-400/40',
+  amber:  'hover:border-amber-400/40',
+  rose:   'hover:border-rose-400/40',
+  violet: 'hover:border-violet-400/40',
+};
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const totalGroups = uses.groups.length;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section
+    data-visible="false"
+    class="uses-page relative isolate overflow-hidden px-5 sm:px-8 py-16 md:py-24 mx-auto w-full max-w-container"
+  >
+    {/* Atmospheric backdrop */}
+    <div class="uses-grid" aria-hidden="true"></div>
+    <div class="uses-blob" aria-hidden="true"></div>
+
+    {/* Back to home */}
+    <p data-reveal="0" class="reveal">
+      <a
+        href="/"
+        class="back-link group inline-flex items-center gap-1.5 font-mono text-[12px] text-text-faint hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
+      >
+        <span class="back-arrow" aria-hidden="true">←</span>
+        <span>Back to home</span>
+      </a>
+    </p>
+
+    {/* Section label */}
+    <p
+      data-reveal="1"
+      class="reveal font-mono text-xs text-text-faint tracking-wider mt-8 mb-4"
+    >
+      <span class="text-accent/80">→</span>
+      <span class="mx-1.5 text-text-faint/70">·</span>
+      <span>{uses.sectionLabel.replace('→ ', '')}</span>
+    </p>
+
+    {/* Heading + underline */}
+    <h1
+      data-reveal="2"
+      class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
+    >
+      {uses.heading}
+    </h1>
+    <span data-reveal="3" class="reveal uses-underline" aria-hidden="true"></span>
+
+    {/* Lead */}
+    <p
+      data-reveal="4"
+      class="reveal mt-8 text-text-muted text-[15px] md:text-base leading-relaxed max-w-[60ch]"
+    >
+      {uses.lead}
+    </p>
+
+    {/* Group grid */}
+    <ul class="mt-10 md:mt-12 list-none p-0 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      {
+        uses.groups.map((g, i) => {
+          const accent = g.accent;
+          return (
+            <li data-reveal={5 + i} class="reveal">
+              <article
+                class={`uses-card relative h-full rounded-xl bg-bg-subtle/55 backdrop-blur-sm border border-border-subtle p-5 transition-[border-color] duration-300 ${ACCENT_BORDER[accent]} overflow-hidden`}
+              >
+                {/* Top accent gradient bar */}
+                <span
+                  class={`pointer-events-none absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${ACCENT_BAR[accent]}`}
+                  aria-hidden="true"
+                ></span>
+
+                {/* Index badge */}
+                <span
+                  class="absolute top-2.5 right-3 font-mono text-[9px] uppercase tracking-[0.18em] text-text-faint/70 select-none"
+                  aria-hidden="true"
+                >
+                  {pad2(i + 1)} / {pad2(totalGroups)}
+                </span>
+
+                {/* Group title */}
+                <header class="flex items-center gap-2 pr-12">
+                  <span class={`block w-2 h-2 rounded-full ${ACCENT_DOT[accent]} shrink-0`} aria-hidden="true"></span>
+                  <h2 class="text-text-primary text-[15px] font-semibold tracking-tight">{g.title}</h2>
+                  <span class="ml-auto font-mono text-[10px] text-text-faint">{g.items.length}</span>
+                </header>
+
+                <span class="block border-t border-border-subtle/60 mt-3 mb-3" aria-hidden="true"></span>
+
+                {/* Items list */}
+                <ul class="space-y-3 list-none p-0">
+                  {g.items.map((item) => (
+                    <li>
+                      <p class="text-text-primary text-[13.5px] font-medium leading-tight">
+                        {item.name}
+                      </p>
+                      <p class="mt-0.5 text-text-muted text-[12.5px] leading-snug">
+                        {item.note}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            </li>
+          );
+        })
+      }
+    </ul>
+
+    {/* Footer line */}
+    <p
+      data-reveal={5 + uses.groups.length}
+      class="reveal mt-10 font-mono text-[11.5px] text-text-faint"
+    >
+      Inspired by <a href="https://uses.tech" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-accent transition-colors">uses.tech</a>.
+    </p>
+  </section>
+
+  <style is:global>
+    /* Atmospheric backdrop */
+    .uses-page .uses-grid {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.10) 1px, transparent 0);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(ellipse 70% 60% at 40% 40%, #000 25%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 40% 40%, #000 25%, transparent 80%);
+    }
+    .uses-page .uses-blob {
+      position: absolute;
+      z-index: -1;
+      top: -160px;
+      left: -120px;
+      width: 540px;
+      height: 460px;
+      border-radius: 9999px;
+      background: conic-gradient(from 320deg, rgba(34,211,238,0.20), rgba(251,191,36,0.16), rgba(168,85,247,0.18), rgba(34,211,238,0.20));
+      filter: blur(70px);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Heading underline */
+    .uses-underline {
+      display: block;
+      margin-top: 18px;
+      height: 2px;
+      width: 0;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #22d3ee, #a855f7);
+      transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;
+      will-change: width;
+    }
+    .uses-page[data-visible='true'] .uses-underline { width: 120px; }
+
+    /* Reveal cascade */
+    .uses-page .reveal {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .uses-page[data-visible='true'] .reveal { opacity: 1; transform: translateY(0); }
+    .uses-page[data-visible='true'] .reveal[data-reveal='0']  { transition-delay:   0ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='1']  { transition-delay:  80ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='2']  { transition-delay: 150ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='3']  { transition-delay: 220ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='4']  { transition-delay: 300ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='5']  { transition-delay: 380ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='6']  { transition-delay: 440ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='7']  { transition-delay: 500ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='8']  { transition-delay: 560ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='9']  { transition-delay: 620ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='10'] { transition-delay: 680ms; }
+    .uses-page[data-visible='true'] .reveal[data-reveal='11'] { transition-delay: 740ms; }
+
+    /* Back-link arrow micro-anim */
+    .back-arrow {
+      display: inline-block;
+      transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .back-link:hover .back-arrow { transform: translateX(-3px); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uses-page .reveal { opacity: 1; transform: none; transition: none; }
+      .uses-underline { width: 120px; transition: none; }
+      .back-arrow { transition: none; transform: none !important; }
+    }
+  </style>
+
+  <script>
+    const section = document.querySelector<HTMLElement>('section.uses-page');
+    if (section) {
+      requestAnimationFrame(() => {
+        section.dataset.visible = 'true';
+      });
+    }
+  </script>
+</BaseLayout>

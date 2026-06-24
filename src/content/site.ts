@@ -68,8 +68,8 @@ export const site = {
       {
         cmd: "ls ./recent",
         out: [
-          "abacus-co-op/   ts · go · react · aws",
-          "ey-software/    react · .net · 400k users",
+          "abacus-co-op/   react · typescript · node · python",
+          "ey-software/    react · ts · node · 400k users",
           "northeastern/   mscs · gpa 3.834",
         ],
       },
@@ -137,7 +137,7 @@ export const site = {
     avatarCaption: "Boston, MA · ET",
     /** Tenure badge rendered above the bio. Spells out total years so recruiters
      *  don't have to subtract dates themselves. Empty string hides the badge. */
-    tenureBadge: "3+ years of professional engineering · 2.5y at EY + ongoing co-op",
+    tenureBadge: "3+ years of professional engineering · 2.5y at EY + 6mo co-op",
     /** Bento row of compact fact cards. */
     facts: [
       { label: "Based in",  value: "Boston, MA" },
@@ -178,14 +178,14 @@ export const site = {
      */
     roles: [
       {
-        role: "Application Developer Co-op",
+        role: "Software Engineer Intern",
         company: "Abacus Health Solutions",
         /** Optional — if set, the company name renders as a link. */
         url: "",
         location: "Cranston, RI",
         start: "Jan 2026",
-        end: "Jul 2026",
-        current: false,
+        end: "Present",
+        current: true,
         accent: "cyan",
         heroStat: {
           value: "20ms",
@@ -194,12 +194,12 @@ export const site = {
           suffix: "ms",
         },
         bullets: [
-          "Engineered end-to-end web applications using TypeScript, Go, and React, reducing portal loading time to 20ms from 3 seconds.",
-          "Integrated REST APIs with OAuth authentication, validated endpoints with Postman and Swagger.",
-          "Deployed and monitored services on AWS with Sentry for error tracking and observability.",
-          "Collaborated across Agile sprint cycles with cross-functional teams.",
+          "Building a full-stack healthcare web application end-to-end, translating Figma designs into a responsive React + TypeScript frontend backed by Node.js and Python services exposed via REST APIs.",
+          "Designed and implemented database schemas in MySQL and integrated Redis for caching and session management, reducing read latency on high-traffic endpoints and easing database load.",
+          "Collaborated directly with designers and product stakeholders to convert Figma mockups into pixel-accurate, responsive UI components, accelerating the design-to-development handoff each sprint.",
+          "Instrumented Sentry across frontend and backend services for real-time error tracking, surfacing production issues within minutes and improving release confidence across the team's deployment cycle.",
         ],
-        stack: ["TypeScript", "Go", "React", "REST APIs", "OAuth", "AWS", "Sentry"],
+        stack: ["React", "TypeScript", "Node.js", "Python", "MySQL", "Redis", "Sentry", "Figma"],
       },
       {
         role: "Technical Support Assistant",
@@ -246,11 +246,11 @@ export const site = {
         stack: ["Teaching", "Discrete Structures"],
       },
       {
-        role: "Software Engineer",
+        role: "Software Development Engineer 1",
         company: "Ernst & Young",
         url: "",
         location: "Delhi, India",
-        start: "Aug 2022",
+        start: "Jul 2022",
         end: "Dec 2024",
         current: false,
         accent: "amber",
@@ -261,13 +261,13 @@ export const site = {
           suffix: "K+",
         },
         bullets: [
-          "Contributed to EY.AI, a generative AI platform serving 400,000+ employees with 99.9% uptime.",
-          "Architected full-stack applications using C#, .NET, Angular, JavaScript, HTML5, and CSS for Fortune 500 clients, generating $500K+ in annual revenue impact.",
-          "Optimized backend performance through algorithmic improvements, achieving 2x throughput and reducing MTTR from 4 hours to 30 minutes.",
-          "Built a React.js data dashboard with custom hooks and SharePoint REST API integration, cutting data retrieval time from 50s to 30s.",
-          "Reduced deployment time by 60% through CI/CD pipeline improvements on Azure DevOps.",
+          "Contributed to EY.AI, a custom generative AI platform built on the OpenAI API and deployed to 400,000+ EY employees globally, launching at 99.9% uptime with enterprise-grade security as part of a 20-engineer team.",
+          "Built and delivered 3+ full-stack web applications using React.js, TypeScript, Node.js, and Microsoft Power Platform for Fortune 500 clients across North America, Europe, Australia, and the Middle East, supporting $500K+ in client engagements.",
+          "Developed a React.js application with advanced search, custom hooks, and SharePoint REST API integration, cutting data-retrieval time from 50s to 30s; refactored data-processing workflows with efficient sorting and graph algorithms, doubling system throughput.",
+          "Integrated REST APIs with MongoDB across 10+ endpoints, configuring CORS, authentication, and error handling for reliable frontend-backend communication.",
+          "Built CI/CD pipelines with Azure DevOps and Git, cutting full-stack deployment time by 60%; instrumented Datadog and CloudWatch monitoring, reducing mean time to resolution from 4 hours to 30 minutes.",
         ],
-        stack: ["C#", ".NET", "Angular", "React", "JavaScript", "Azure DevOps", "CI/CD"],
+        stack: ["React", "TypeScript", "Node.js", "Power Platform", "MongoDB", "Azure DevOps", "Datadog"],
       },
     ],
   },
@@ -311,8 +311,8 @@ export const site = {
         /** Empty when the affiliated college within IPU isn't specified. */
         department: "",
         location: "Delhi, India",
-        start: "Jul 2018",
-        end: "Jul 2022",
+        start: "Aug 2018",
+        end: "Aug 2022",
         accent: "amber",
         gpa: "3.55 / 4.0",
         /**
@@ -398,6 +398,7 @@ export const site = {
         skills: [
           "AWS", "S3", "Azure", "Azure DevOps",
           "Docker", "Kubernetes", "Jenkins", "CI/CD",
+          "Kafka", "RabbitMQ",
           "Datadog", "CloudWatch", "Sentry",
         ],
       },
@@ -532,7 +533,7 @@ export const site = {
     sectionLabel: "06 · FAQ",
     heading: "FAQs.",
     /** Optional status banner above the questions. Empty string hides it. */
-    status: "Open for full-time roles · starting May 2027",
+    status: "Open for Spring 2027 co-op + full-time roles starting May 2027",
     /** Optional footer CTA. Points at #contact since the section now exists. */
     footer: {
       prompt: "Still got questions?",
@@ -542,12 +543,12 @@ export const site = {
     items: [
       {
         q: "What roles are you looking for?",
-        a: "Full-time <strong>software engineering roles starting May 2027</strong>. Full-stack, backend, or anything close to AI/ML systems and data infrastructure. I'm open to IC tracks at startups and at bigger companies. New-grad and early-career titles fit. With 2.5 years already at EY, I tend to ramp up faster than the title typically implies.",
+        a: "Two things, in parallel: <strong>a Spring 2027 software-engineering co-op</strong> through Northeastern's co-op program, and <strong>full-time software engineering roles starting May 2027</strong>. Full-stack, backend, or anything close to AI/ML systems and data infrastructure. I'm open to IC tracks at startups and at bigger companies. New-grad and early-career titles fit. With 2.5 years already at EY, I tend to ramp up faster than the title typically implies.",
         accent: "cyan",
       },
       {
         q: "When are you available to start?",
-        a: "I finish my MSCS at Northeastern in <strong>May 2027</strong> and can start full-time right after. I'm currently a co-op at Abacus Health Solutions through July 2026, then back to coursework for my final two semesters. I'm available to interview anytime, including during co-op hours with a day's notice.",
+        a: "Two timelines: I can start a <strong>Spring 2027 co-op in January 2027</strong>, and I finish my MSCS at Northeastern in <strong>May 2027</strong> for full-time. I'm currently on co-op at Abacus Health Solutions, then back to coursework. I'm available to interview anytime, including during co-op hours with a day's notice.",
         accent: "amber",
       },
       {

@@ -55,7 +55,7 @@ export const site = {
     /** Inline social row below the CTAs. */
     socials: [
       { label: "GitHub",   href: "https://github.com/archit2901" },
-      { label: "LinkedIn", href: "https://linkedin.com/in/archit-gupta" },
+      { label: "LinkedIn", href: "https://linkedin.com/in/archit2901" },
       { label: "Email",    href: "mailto:gupta.archit1@northeastern.edu" },
     ],
     /**

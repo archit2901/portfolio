@@ -33,20 +33,6 @@ const ACCENT_DOT: Record<string, string> = {
   violet: 'bg-violet-400',
 };
 
-/**
- * Explicit bento placement by role index. Designed for 4 roles in this order:
- *   0 — Abacus (most recent, large feature, top-left)
- *   1 — NEU Tech Support (small, bottom-left)
- *   2 — Khoury TA (small, bottom-right)
- *   3 — EY (large feature, top-right)
- */
-const ROLE_LAYOUT: string[] = [
-  'md:col-start-1 md:col-span-7 md:row-start-1',
-  'md:col-start-1 md:col-span-6 md:row-start-2',
-  'md:col-start-7 md:col-span-6 md:row-start-2',
-  'md:col-start-8 md:col-span-5 md:row-start-1',
-];
-
 const totalRoles = experience.roles.length;
 const pad2 = (n: number) => String(n).padStart(2, '0');
 ---
@@ -102,14 +88,13 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
   </div>
 
   {/* ── Bento of role cards ─────────────────────────────────────── */}
-  <ul class="exp-bento mt-5 md:mt-6 list-none p-0 grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-3 md:gap-4 md:auto-rows-fr">
+  <ul class="exp-stack mt-5 md:mt-6 list-none p-0 grid grid-cols-1 gap-3 md:gap-4">
     {
       experience.roles.map((r, i) => {
         const accent = (r as any).accent ?? 'cyan';
         const hero = (r as any).heroStat as { value: string; label: string } | undefined;
-        const layout = ROLE_LAYOUT[i] ?? '';
         return (
-          <li class={`exp-cell ${layout}`} data-reveal={4 + i}>
+          <li class="exp-cell" data-reveal={4 + i}>
             <div class={`exp-card-wrap relative h-full rounded-xl ${r.current ? 'p-px is-current' : ''}`}>
               <article
                 class={`exp-card relative h-full flex flex-col rounded-xl bg-bg-subtle/55 backdrop-blur-sm border border-border-subtle p-4 md:p-5 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 ${ACCENT_BORDER[accent]} overflow-hidden`}
@@ -198,7 +183,7 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
                           <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                       </summary>
-                      <ul class="exp-collapse-content space-y-1.5 list-none p-0 md:mt-0 mt-3">
+                      <ul class="exp-collapse-content space-y-1.5 md:space-y-0 md:grid-cols-2 md:gap-x-8 md:gap-y-1.5 list-none p-0 md:mt-0 mt-3">
                         {r.bullets.map((b) => (
                           <li class="flex gap-2 text-[13px] text-text-muted leading-snug">
                             <span class={`select-none mt-0.5 shrink-0 ${ACCENT_TEXT[accent]}`} aria-hidden="true">▸</span>
@@ -329,7 +314,7 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
   .exp-collapse[open] .exp-collapse-label-closed { display: none; }
   .exp-collapse[open] .exp-collapse-label-open { display: inline; }
   @media (min-width: 768px) {
-    .exp-collapse > .exp-collapse-content { display: block !important; }
+    .exp-collapse > .exp-collapse-content { display: grid !important; }
   }
 
   /* ── Reduced motion gates ────────────────────────────────────── */

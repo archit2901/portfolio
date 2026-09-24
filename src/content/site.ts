@@ -217,9 +217,11 @@ export const site = {
           suffix: "%",
         },
         bullets: [
-          "Programmed a PowerShell script to automate imaging and configuration of 100+ Windows devices, reducing manual errors by 95% and accelerating deployment by 40% while cutting software-related support tickets by 35% across JIRA and ServiceNow.",
+          "Engineered intelligent automation scripts supporting 500+ staff daily, preventing system disruptions and improving user experience.",
+          "Built scalable PowerShell automation, reducing manual configuration errors by 95% and accelerating deployment by 40%.",
+          "Implemented targeted solutions across 40+ systems, decreasing JIRA support tickets by 35%.",
         ],
-        stack: ["PowerShell", "Windows", "JIRA", "ServiceNow"],
+        stack: ["PowerShell", "Automation", "JIRA"],
       },
       {
         role: "Graduate Teaching Assistant — CS1800",
@@ -237,9 +239,11 @@ export const site = {
           suffix: "+",
         },
         bullets: [
-          "Directed weekly CS1800 Discrete Structures recitations and office hours for 100+ students, using 20+ practical code examples to teach data structures and algorithms and support a 15% rise in average exam scores.",
+          "Facilitated weekly recitations for 100+ students, raising exam scores by an average of 10 points across sections.",
+          "Developed 20+ visual code examples and presentations bridging mathematical theory with applied implementation.",
+          "Held office hours and provided targeted feedback on assignments covering logic, set theory, graph theory, and combinatorics.",
         ],
-        stack: ["Discrete Structures", "Data Structures", "Algorithms"],
+        stack: ["Teaching", "Discrete Structures"],
       },
       {
         role: "Software Engineer",

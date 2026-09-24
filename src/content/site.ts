@@ -167,7 +167,7 @@ export const site = {
       "50+ client companies served",
     ],
     /**
-     * Most recent first. The role flagged `current: true` gets the rotating
+     * Render order (EY is pinned second on purpose). The role flagged `current: true` gets the rotating
      * gradient border + a small "Currently" badge.
      *
      * `heroStat` drives the giant number on each card (count-up animates from 0
@@ -200,6 +200,33 @@ export const site = {
           "Wrote unit tests with Vitest and end-to-end tests with Playwright, integrated Sentry for logging and error tracking, and managed version control through Git and Azure DevOps.",
         ],
         stack: ["React", "TypeScript", "Syncfusion", "Tailwind CSS", "SQL", "Vitest", "Playwright", "Sentry"],
+      },
+      {
+        role: "Software Engineer",
+        company: "Ernst & Young",
+        url: "",
+        location: "Delhi, India",
+        start: "Aug 2022",
+        end: "Dec 2024",
+        current: false,
+        accent: "amber",
+        heroStat: {
+          value: "400K+",
+          label: "users on EY.AI · 99.9% uptime",
+          countUpTo: 400,
+          suffix: "K+",
+        },
+        bullets: [
+          "Architected and delivered 3+ full-stack web applications with React for Fortune 500 clients across North America, Europe, Australia, and the Middle East, contributing to $500K+ in annual revenue.",
+          "Implemented full-stack internal web applications for EY employees worldwide, integrating React front ends with REST APIs and a MongoDB backend to streamline internal workflows across global offices.",
+          "Developed a React search portal integrating the SharePoint REST API that let EY employees retrieve internal data through a single interface, replacing the manual process of querying the SharePoint database by hand.",
+          "Engineered EY.AI's user-facing application, a generative AI platform on the OpenAI API serving 400,000+ employees at 99.9% uptime with enterprise security, spanning the front end, API integration, and prompt/retrieval logic.",
+          "Wrote unit, integration, and end-to-end tests with Jest, Cypress, and Postman to validate application behavior and catch regressions before release across full-stack projects.",
+          "Optimized slow, established EY data-processing jobs and queries with caching, indexing, batching, and parallelization, and streamlined data pipelines across microservices to improve reliability and roughly double throughput.",
+          "Integrated logging and monitoring with Datadog and CloudWatch to surface production issues faster, reducing mean time to resolution from 4 hours to 30 minutes.",
+          "Built automated CI/CD pipelines with Azure DevOps and Git workflows, cutting full-stack deployment time by 60% and standardizing releases across projects.",
+        ],
+        stack: ["React", "Node.js", "MongoDB", "SharePoint", "OpenAI API", "Jest", "Cypress", "Azure DevOps", "Datadog"],
       },
       {
         role: "Technical Support Assistant",
@@ -244,33 +271,6 @@ export const site = {
           "Held office hours and provided targeted feedback on assignments covering logic, set theory, graph theory, and combinatorics.",
         ],
         stack: ["Teaching", "Discrete Structures"],
-      },
-      {
-        role: "Software Engineer",
-        company: "Ernst & Young",
-        url: "",
-        location: "Delhi, India",
-        start: "Aug 2022",
-        end: "Dec 2024",
-        current: false,
-        accent: "amber",
-        heroStat: {
-          value: "400K+",
-          label: "users on EY.AI · 99.9% uptime",
-          countUpTo: 400,
-          suffix: "K+",
-        },
-        bullets: [
-          "Architected and delivered 3+ full-stack web applications with React for Fortune 500 clients across North America, Europe, Australia, and the Middle East, contributing to $500K+ in annual revenue.",
-          "Implemented full-stack internal web applications for EY employees worldwide, integrating React front ends with REST APIs and a MongoDB backend to streamline internal workflows across global offices.",
-          "Developed a React search portal integrating the SharePoint REST API that let EY employees retrieve internal data through a single interface, replacing the manual process of querying the SharePoint database by hand.",
-          "Engineered EY.AI's user-facing application, a generative AI platform on the OpenAI API serving 400,000+ employees at 99.9% uptime with enterprise security, spanning the front end, API integration, and prompt/retrieval logic.",
-          "Wrote unit, integration, and end-to-end tests with Jest, Cypress, and Postman to validate application behavior and catch regressions before release across full-stack projects.",
-          "Optimized slow, established EY data-processing jobs and queries with caching, indexing, batching, and parallelization, and streamlined data pipelines across microservices to improve reliability and roughly double throughput.",
-          "Integrated logging and monitoring with Datadog and CloudWatch to surface production issues faster, reducing mean time to resolution from 4 hours to 30 minutes.",
-          "Built automated CI/CD pipelines with Azure DevOps and Git workflows, cutting full-stack deployment time by 60% and standardizing releases across projects.",
-        ],
-        stack: ["React", "Node.js", "MongoDB", "SharePoint", "OpenAI API", "Jest", "Cypress", "Azure DevOps", "Datadog"],
       },
     ],
   },

@@ -195,7 +195,7 @@ export const site = {
         },
         bullets: [
           "Developed a responsive, patient-facing web portal for diabetic members across 50+ client companies using React, TypeScript, Syncfusion, and Tailwind CSS, surfacing insurance details, plan status, Rx cards, and co-pay guidance.",
-          "Engineered program-based views across 30+ integrated reward programs and their insurance providers, mapping each member to their plan and rendering personalized benefits, eligibility, and next-step details.",
+          "Engineered program-based views across 30+ integrated reward programs and insurance providers, mapping each member to the correct plan and rendering personalized benefits, eligibility, and next-step details.",
           "Integrated RESTful APIs backed by a SQL database to power member data, plan assignments, and benefit queries, ensuring reliable data flow between the front end and the data layer.",
           "Wrote unit tests with Vitest and end-to-end tests with Playwright, integrated Sentry for logging and error tracking, and managed version control through Git and Azure DevOps.",
         ],

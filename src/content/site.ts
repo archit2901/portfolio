@@ -68,7 +68,7 @@ export const site = {
       {
         cmd: "ls ./recent",
         out: [
-          "abacus-co-op/   react · typescript · node · python",
+          "abacus-co-op/   react · typescript · tailwind · sql",
           "ey-software/    react · ts · node · 400k users",
           "northeastern/   mscs · gpa 3.834",
         ],
@@ -96,7 +96,7 @@ export const site = {
     /** Body paragraphs. Add as many as you want; rendered in order. */
     bio: [
       "I'm Archit, a software engineer and CS Master's student at Northeastern, based in Boston. Before grad school, I spent 2.5 years at Ernst & Young in Delhi building full-stack applications for Fortune 500 clients, including contributing to EY.AI, a generative AI platform that scaled to 400,000+ users at 99.9% uptime.",
-      "I work across the stack: React, Next.js, and TypeScript on the frontend; Go, Node, and Python on the backend, with deeper interests in AI/ML systems and data infrastructure. I'm currently interning at Abacus Health Solutions, where I've been shipping production features using TypeScript, Go, REST APIs, Sentry, and AWS. On the side, I TA'd CS1800 (Discrete Structures) at Khoury, which turned out to be one of the most useful things I've done for my own engineering thinking.",
+      "I work across the stack: React, Next.js, and TypeScript on the frontend; Go, Node, and Python on the backend, with deeper interests in AI/ML systems and data infrastructure. Most recently I interned at Abacus Health Solutions, building a patient-facing web portal for members across 50+ client companies with React, TypeScript, Tailwind CSS, and REST APIs over a SQL database, tested with Vitest and Playwright. On the side, I TA'd CS1800 (Discrete Structures) at Khoury, which turned out to be one of the most useful things I've done for my own engineering thinking.",
     ],
     /** Tech labels for the inline pill strip. They wrap onto multiple rows. */
     techStack: [
@@ -108,8 +108,6 @@ export const site = {
       "Node.js",
       "Python",
       "Java",
-      "C#",
-      ".NET",
       "PostgreSQL",
       "MongoDB",
       "Redis",
@@ -126,6 +124,8 @@ export const site = {
       "CI/CD",
       "Tailwind",
       "Express",
+      "FastAPI",
+      "Playwright",
     ],
     portrait: {
       /** Drop a new file in /public and update this path to swap. */
@@ -164,7 +164,7 @@ export const site = {
       "60% deploy time cut",
       "100+ students taught",
       "95% errors ↓",
-      "Portal load 3s → 20ms",
+      "50+ client companies served",
     ],
     /**
      * Most recent first. The role flagged `current: true` gets the rotating
@@ -184,22 +184,22 @@ export const site = {
         url: "",
         location: "Cranston, RI",
         start: "Jan 2026",
-        end: "Present",
-        current: true,
+        end: "Jul 2026",
+        current: false,
         accent: "cyan",
         heroStat: {
-          value: "20ms",
-          label: "portal load (from 3s)",
-          countUpTo: 20,
-          suffix: "ms",
+          value: "50+",
+          label: "client companies on the portal",
+          countUpTo: 50,
+          suffix: "+",
         },
         bullets: [
-          "Building a full-stack healthcare web application end-to-end, translating Figma designs into a responsive React + TypeScript frontend backed by Node.js and Python services exposed via REST APIs.",
-          "Designed and implemented database schemas in MySQL and integrated Redis for caching and session management, reducing read latency on high-traffic endpoints and easing database load.",
-          "Collaborated directly with designers and product stakeholders to convert Figma mockups into pixel-accurate, responsive UI components, accelerating the design-to-development handoff each sprint.",
-          "Instrumented Sentry across frontend and backend services for real-time error tracking, surfacing production issues within minutes and improving release confidence across the team's deployment cycle.",
+          "Developed a responsive, patient-facing web portal for diabetic members across 50+ client companies using React, TypeScript, Syncfusion, and Tailwind CSS, surfacing insurance details, plan status, Rx cards, and co-pay guidance.",
+          "Engineered program-based views across 30+ integrated reward programs and their insurance providers, mapping each member to their plan and rendering personalized benefits, eligibility, and next-step details.",
+          "Integrated RESTful APIs backed by a SQL database to power member data, plan assignments, and benefit queries, ensuring reliable data flow between the front end and the data layer.",
+          "Wrote unit tests with Vitest and end-to-end tests with Playwright, integrated Sentry for logging and error tracking, and managed version control through Git and Azure DevOps.",
         ],
-        stack: ["React", "TypeScript", "Node.js", "Python", "MySQL", "Redis", "Sentry", "Figma"],
+        stack: ["React", "TypeScript", "Syncfusion", "Tailwind CSS", "SQL", "Vitest", "Playwright", "Sentry"],
       },
       {
         role: "Technical Support Assistant",
@@ -207,7 +207,7 @@ export const site = {
         url: "",
         location: "Boston, MA",
         start: "Feb 2025",
-        end: "Jan 2026",
+        end: "Dec 2025",
         current: false,
         accent: "rose",
         heroStat: {
@@ -217,11 +217,9 @@ export const site = {
           suffix: "%",
         },
         bullets: [
-          "Engineered intelligent automation scripts supporting 500+ staff daily, preventing system disruptions and improving user experience.",
-          "Built scalable PowerShell automation, reducing manual configuration errors by 95% and accelerating deployment by 40%.",
-          "Implemented targeted solutions across 40+ systems, decreasing JIRA support tickets by 35%.",
+          "Programmed a PowerShell script to automate imaging and configuration of 100+ Windows devices, reducing manual errors by 95% and accelerating deployment by 40% while cutting software-related support tickets by 35% across JIRA and ServiceNow.",
         ],
-        stack: ["PowerShell", "Automation", "JIRA"],
+        stack: ["PowerShell", "Windows", "JIRA", "ServiceNow"],
       },
       {
         role: "Graduate Teaching Assistant — CS1800",
@@ -239,18 +237,16 @@ export const site = {
           suffix: "+",
         },
         bullets: [
-          "Facilitated weekly recitations for 100+ students, raising exam scores by an average of 10 points across sections.",
-          "Developed 20+ visual code examples and presentations bridging mathematical theory with applied implementation.",
-          "Held office hours and provided targeted feedback on assignments covering logic, set theory, graph theory, and combinatorics.",
+          "Directed weekly CS1800 Discrete Structures recitations and office hours for 100+ students, using 20+ practical code examples to teach data structures and algorithms and support a 15% rise in average exam scores.",
         ],
-        stack: ["Teaching", "Discrete Structures"],
+        stack: ["Discrete Structures", "Data Structures", "Algorithms"],
       },
       {
-        role: "Software Development Engineer 1",
+        role: "Software Engineer",
         company: "Ernst & Young",
         url: "",
         location: "Delhi, India",
-        start: "Jul 2022",
+        start: "Aug 2022",
         end: "Dec 2024",
         current: false,
         accent: "amber",
@@ -261,13 +257,16 @@ export const site = {
           suffix: "K+",
         },
         bullets: [
-          "Contributed to EY.AI, a custom generative AI platform built on the OpenAI API and deployed to 400,000+ EY employees globally, launching at 99.9% uptime with enterprise-grade security as part of a 20-engineer team.",
-          "Built and delivered 3+ full-stack web applications using React.js, TypeScript, Node.js, and Microsoft Power Platform for Fortune 500 clients across North America, Europe, Australia, and the Middle East, supporting $500K+ in client engagements.",
-          "Developed a React.js application with advanced search, custom hooks, and SharePoint REST API integration, cutting data-retrieval time from 50s to 30s; refactored data-processing workflows with efficient sorting and graph algorithms, doubling system throughput.",
-          "Integrated REST APIs with MongoDB across 10+ endpoints, configuring CORS, authentication, and error handling for reliable frontend-backend communication.",
-          "Built CI/CD pipelines with Azure DevOps and Git, cutting full-stack deployment time by 60%; instrumented Datadog and CloudWatch monitoring, reducing mean time to resolution from 4 hours to 30 minutes.",
+          "Architected and delivered 3+ full-stack web applications with React for Fortune 500 clients across North America, Europe, Australia, and the Middle East, contributing to $500K+ in annual revenue.",
+          "Implemented full-stack internal web applications for EY employees worldwide, integrating React front ends with REST APIs and a MongoDB backend to streamline internal workflows across global offices.",
+          "Developed a React search portal integrating the SharePoint REST API that let EY employees retrieve internal data through a single interface, replacing the manual process of querying the SharePoint database by hand.",
+          "Engineered EY.AI's user-facing application, a generative AI platform on the OpenAI API serving 400,000+ employees at 99.9% uptime with enterprise security, spanning the front end, API integration, and prompt/retrieval logic.",
+          "Wrote unit, integration, and end-to-end tests with Jest, Cypress, and Postman to validate application behavior and catch regressions before release across full-stack projects.",
+          "Optimized slow, established EY data-processing jobs and queries with caching, indexing, batching, and parallelization, and streamlined data pipelines across microservices to improve reliability and roughly double throughput.",
+          "Integrated logging and monitoring with Datadog and CloudWatch to surface production issues faster, reducing mean time to resolution from 4 hours to 30 minutes.",
+          "Built automated CI/CD pipelines with Azure DevOps and Git workflows, cutting full-stack deployment time by 60% and standardizing releases across projects.",
         ],
-        stack: ["React", "TypeScript", "Node.js", "Power Platform", "MongoDB", "Azure DevOps", "Datadog"],
+        stack: ["React", "Node.js", "MongoDB", "SharePoint", "OpenAI API", "Jest", "Cypress", "Azure DevOps", "Datadog"],
       },
     ],
   },
@@ -311,8 +310,8 @@ export const site = {
         /** Empty when the affiliated college within IPU isn't specified. */
         department: "",
         location: "Delhi, India",
-        start: "Aug 2018",
-        end: "Aug 2022",
+        start: "Jul 2018",
+        end: "Jul 2022",
         accent: "amber",
         gpa: "3.55 / 4.0",
         /**
@@ -362,33 +361,25 @@ export const site = {
         accent: "cyan",
         skills: [
           "TypeScript", "JavaScript", "Python", "Go",
-          "Java", "C#", "C++", "SQL",
+          "Java", "C++", "SQL",
         ],
       },
       {
-        key: "frontend",
-        title: "Frontend",
+        key: "web",
+        title: "Web & Frameworks",
         accent: "amber",
         skills: [
-          "React", "Next.js", "AngularJS", "Tailwind",
-          "HTML", "CSS", "jQuery", "Bootstrap", "Flutter",
-        ],
-      },
-      {
-        key: "backend",
-        title: "Backend",
-        accent: "rose",
-        skills: [
-          "Node.js", "Express", ".NET", "Power Platform",
+          "React", "Next.js", "Node.js", "Express", "FastAPI",
+          "REST APIs", "GraphQL", "HTML", "CSS", "Tailwind CSS",
         ],
       },
       {
         key: "database",
-        title: "Database",
+        title: "Databases",
         accent: "violet",
         skills: [
-          "PostgreSQL", "MongoDB", "MySQL",
-          "SQL Server", "Redis", "SharePoint",
+          "PostgreSQL", "MySQL", "MongoDB",
+          "Redis", "SQL Server", "Supabase",
         ],
       },
       {
@@ -396,21 +387,26 @@ export const site = {
         title: "Cloud & DevOps",
         accent: "cyan",
         skills: [
-          "AWS", "S3", "Azure", "Azure DevOps",
-          "Docker", "Kubernetes", "Jenkins", "CI/CD",
-          "Kafka", "RabbitMQ",
-          "Datadog", "CloudWatch", "Sentry",
+          "AWS", "Azure DevOps", "Docker", "Kubernetes",
+          "CI/CD", "GitHub Actions", "Jenkins",
+          "Datadog", "Sentry", "CloudWatch",
+        ],
+      },
+      {
+        key: "testing",
+        title: "Testing",
+        accent: "rose",
+        skills: [
+          "Jest", "Cypress", "Playwright", "Vitest", "Postman",
         ],
       },
       {
         key: "tools",
-        title: "Tools & Workflow",
+        title: "Tools & Practices",
         accent: "amber",
         skills: [
-          "Git", "GitHub", "GitLab", "REST APIs", "GraphQL",
-          "OAuth", "Postman", "Swagger", "JIRA", "ServiceNow",
-          "Linux", "Agile/Scrum", "PowerShell",
-          "Claude Code", "GitHub Copilot", "ChatGPT API",
+          "Git", "GitHub", "Agile/Scrum", "OAuth", "Swagger",
+          "Linux", "JIRA", "Claude Code", "GitHub Copilot",
         ],
       },
     ],
@@ -548,12 +544,12 @@ export const site = {
       },
       {
         q: "When are you available to start?",
-        a: "Two timelines: I can start a <strong>Spring 2027 co-op in January 2027</strong>, and I finish my MSCS at Northeastern in <strong>May 2027</strong> for full-time. I'm currently on co-op at Abacus Health Solutions, then back to coursework. I'm available to interview anytime, including during co-op hours with a day's notice.",
+        a: "Two timelines: I can start a <strong>Spring 2027 co-op in January 2027</strong>, and I finish my MSCS at Northeastern in <strong>May 2027</strong> for full-time. I wrapped up my co-op at Abacus Health Solutions in July 2026 and I'm back to coursework. I'm available to interview anytime with a day's notice.",
         accent: "amber",
       },
       {
         q: "Where are you based, and are you open to relocation?",
-        a: "Boston, MA. Open to <strong>NYC, SF Bay Area, Seattle, Austin</strong>, or <strong>fully remote</strong> for the right team. I'd prefer hybrid in-office a few days a week. I do my best work around other people. US-wide timezone collaboration works for me since I already do it at Abacus.",
+        a: "Boston, MA. Open to <strong>NYC, SF Bay Area, Seattle, Austin</strong>, or <strong>fully remote</strong> for the right team. I'd prefer hybrid in-office a few days a week. I do my best work around other people. US-wide timezone collaboration works for me since I did it daily at Abacus.",
         accent: "rose",
       },
       {
@@ -563,12 +559,12 @@ export const site = {
       },
       {
         q: "What's your biggest impact so far?",
-        a: "At <strong>Ernst & Young</strong> I contributed to <strong>EY.AI</strong>, an internal generative-AI platform that scaled to <strong>400,000+ employees at 99.9% uptime</strong>. On the same team I cut <strong>MTTR from 4 hours to 30 minutes</strong> through algorithmic improvements and observability work in Datadog and CloudWatch. I also shipped CI/CD changes that <strong>reduced deployment time by 60%</strong>. Across 2.5 years, my client work drove <strong>$500K+ in annual revenue impact</strong>.",
+        a: "At <strong>Ernst & Young</strong> I engineered the user-facing application for <strong>EY.AI</strong>, an internal generative-AI platform that scaled to <strong>400,000+ employees at 99.9% uptime</strong>. On the same team I cut <strong>MTTR from 4 hours to 30 minutes</strong> through observability work in Datadog and CloudWatch. I also shipped CI/CD changes that <strong>reduced deployment time by 60%</strong>. Across 2.5 years, my client work drove <strong>$500K+ in annual revenue impact</strong>.",
         accent: "cyan",
       },
       {
         q: "What stack are you strongest in?",
-        a: "Frontend: <strong>TypeScript, React, Next.js, Tailwind</strong>. Backend: <strong>Go, Node.js, Python, C#/.NET</strong>. Infra: <strong>AWS, Docker, PostgreSQL, Redis, Sentry</strong>. I've shipped production code in every layer of that stack within the last twelve months. Recent personal builds skew toward <strong>Go services with Postgres and Redis</strong> (see <a href=\"https://github.com/archit2901/url-shortener\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"faq-link\">url-shortener</a>) and <strong>AI integrations</strong> like <a href=\"https://github.com/archit2901/sentiment-aura\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"faq-link\">sentiment-aura</a> and <a href=\"https://github.com/archit2901/resume-to-portfolio\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"faq-link\">resume-to-portfolio</a>, both built on the Anthropic API.",
+        a: "Frontend: <strong>TypeScript, React, Next.js, Tailwind</strong>. Backend: <strong>Go, Node.js, Express, Python/FastAPI</strong>. Infra: <strong>AWS, Docker, PostgreSQL, Redis, Sentry</strong>. Testing: <strong>Jest, Cypress, Playwright, Vitest</strong>. I've shipped production code in every layer of that stack within the last twelve months. Recent personal builds skew toward <strong>Go services with Postgres and Redis</strong> (see <a href=\"https://github.com/archit2901/url-shortener\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"faq-link\">url-shortener</a>) and <strong>AI integrations</strong> like <a href=\"https://github.com/archit2901/sentiment-aura\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"faq-link\">sentiment-aura</a> and <a href=\"https://github.com/archit2901/resume-to-portfolio\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"faq-link\">resume-to-portfolio</a>, both built on the Anthropic API.",
         accent: "amber",
       },
       {
@@ -602,7 +598,7 @@ export const site = {
     status: [
       { label: "Boston, MA · ET",           icon: "dot"   },
       { label: "Replies within 24h",        icon: "mail"  },
-      { label: "On co-op through Jul 2026", icon: "clock" },
+      { label: "Open for 2027 roles",        icon: "clock" },
     ],
   },
 
@@ -651,7 +647,7 @@ export const site = {
           { name: "Notion",      note: "Notes, drafts, second brain. Database views for project planning." },
           { name: "Raycast",     note: "Spotlight replacement. Window management + clipboard history + AI chat." },
           { name: "Arc",         note: "Daily driver browser. Tab groups by project keep context separate." },
-          { name: "Postman",     note: "API testing during the Abacus co-op. Saves request collections per project." },
+          { name: "Postman",     note: "API testing for every project. Saves request collections per project." },
         ],
       },
       {

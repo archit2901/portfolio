@@ -35,7 +35,7 @@ const ACCENT_DOT: Record<string, string> = {
 
 /**
  * Explicit bento placement by role index. Designed for 4 roles in this order:
- *   0 — Abacus (current, large feature, top-left)
+ *   0 — Abacus (most recent, large feature, top-left)
  *   1 — NEU Tech Support (small, bottom-left)
  *   2 — Khoury TA (small, bottom-right)
  *   3 — EY (large feature, top-right)
@@ -173,7 +173,7 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
 
                 {/* Dates */}
                 <p class="mt-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-text-faint">
-                  {r.start === r.end ? r.start : `${r.start} — ${r.end}`}
+                  {(r.start as string) === r.end ? r.start : `${r.start} — ${r.end}`}
                 </p>
 
                 {/* Separator + bullets (collapsible on mobile) */}

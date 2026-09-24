@@ -14,7 +14,7 @@
 
 Full-stack software engineer · MSCS @ Northeastern · Boston
 
-I build polished web products end-to-end — APIs, infra, and pixels. Currently a co-op at **Abacus Health Solutions** shipping production features in TypeScript and Go. Previously **2.5 years at Ernst & Young**, where I contributed to EY.AI (400k+ users, 99.9% uptime).
+I build polished web products end-to-end — APIs, infra, and pixels. Most recently a co-op at **Abacus Health Solutions**, building a patient-facing web portal in React and TypeScript. Previously **2.5 years at Ernst & Young**, where I engineered the user-facing app for EY.AI (400k+ users, 99.9% uptime).
 
 **Open for full-time roles starting May 2027.**
 
@@ -46,9 +46,10 @@ Browse all on [architgupta.me/projects →](https://architgupta.me/projects)
 ### Stack
 
 ```
-TypeScript · JavaScript · Python · Go · Java · C# · C++ · SQL
-React · Next.js · AngularJS · Tailwind · Node.js · Express · .NET
-PostgreSQL · MongoDB · MySQL · Redis · SQL Server
-AWS · Azure · Docker · Kubernetes · Datadog · CloudWatch · Sentry
-Claude Code · GitHub Copilot · ChatGPT API
+TypeScript · JavaScript · Python · Go · Java · C++ · SQL
+React · Next.js · Node.js · Express · FastAPI · GraphQL · Tailwind CSS
+PostgreSQL · MySQL · MongoDB · Redis · SQL Server · Supabase
+AWS · Azure DevOps · Docker · Kubernetes · GitHub Actions · Datadog · Sentry
+Jest · Cypress · Playwright · Vitest · Postman
+Claude Code · GitHub Copilot
 ```

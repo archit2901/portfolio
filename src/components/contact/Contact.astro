@@ -138,7 +138,7 @@ const ACTION_VERB: Record<string, string> = {
               href={link.href}
               target={isExternal ? '_blank' : undefined}
               rel={isExternal ? 'noopener noreferrer' : undefined}
-              download={link.action === 'download' ? '' : undefined}
+              download={link.action === 'download' ? site.nav.resumeFileName : undefined}
               aria-label={link.label}
               class={`group ct-tile relative block rounded-xl bg-bg-subtle/55 backdrop-blur-sm border border-border-subtle p-4 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 ${ACCENT_BORDER[accent]} overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base`}
               data-accent={accent}

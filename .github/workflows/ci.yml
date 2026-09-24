@@ -28,3 +28,36 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # Broken-link check over the built HTML. Config lives in lychee.toml.
+      - name: Link check
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config lychee.toml --root-dir "${{ github.workspace }}/dist" "dist/**/*.html"
+          fail: true
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+  lighthouse:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      # Scores and thresholds live in lighthouserc.json.
+      - name: Lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true

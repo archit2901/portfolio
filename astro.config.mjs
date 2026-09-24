@@ -7,6 +7,7 @@ export default defineConfig({
   site: 'https://architgupta.me',
   integrations: [
     tailwind({ applyBaseStyles: false }),
-    sitemap(),
+    // /blog is a placeholder until the first posts ship
+    sitemap({ filter: (page) => !page.endsWith('/blog/') }),
   ],
 });

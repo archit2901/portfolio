@@ -1,0 +1,19 @@
+# Link-check config for CI (lycheeverse/lychee-action).
+
+# Don't check mail links.
+exclude = [
+  "^mailto:",
+  # LinkedIn answers bots with HTTP 999
+  "linkedin\\.com",
+  # The 404 page's own canonical URL is supposed to 404
+  "architgupta\\.me/404/?$",
+]
+
+# Treat rate limiting as OK rather than failing the build.
+accept = ["200..=299", "429"]
+
+max_retries = 3
+timeout = 20
+
+# Directory links like /projects/ resolve to index.html in the build output.
+index_files = ["index.html"]

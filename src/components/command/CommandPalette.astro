@@ -9,7 +9,7 @@ import { site } from '~/content/site';
 type PaletteItem =
   | { kind: 'navigate'; label: string; target: string; hint?: string; group: 'Navigate' }
   | { kind: 'open';     label: string; href: string;   hint?: string; group: 'Open' }
-  | { kind: 'download'; label: string; href: string;   hint?: string; group: 'Download' }
+  | { kind: 'download'; label: string; href: string;   filename: string; hint?: string; group: 'Download' }
   | { kind: 'toggle';   label: string; action: string; hint?: string; group: 'Preferences' };
 
 // Map nav links to chord hints — letter after `g` that scrolls to that section.
@@ -54,7 +54,7 @@ const items: PaletteItem[] = [
     label: s.label,
     href: s.href,
   })),
-  { kind: 'download', group: 'Download', label: 'Résumé (PDF)', href: site.nav.resumeHref },
+  { kind: 'download', group: 'Download', label: 'Résumé (PDF)', href: site.nav.resumeHref, filename: site.nav.resumeFileName },
   { kind: 'toggle',   group: 'Preferences', label: 'Toggle reduced motion', action: 'reduce-motion' },
 ];
 ---
@@ -350,7 +350,7 @@ const items: PaletteItem[] = [
       } else if (it.kind === 'download') {
         const a = document.createElement('a');
         a.href = it.href;
-        a.download = '';
+        a.download = it.filename ?? '';
         document.body.appendChild(a);
         a.click();
         a.remove();

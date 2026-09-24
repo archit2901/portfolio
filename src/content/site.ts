@@ -32,12 +32,13 @@ export const site = {
       { label: "Education",  href: "#education"  },
       { label: "FAQ",        href: "#faq"        },
       { label: "Contact",    href: "#contact"    },
-      { label: "Blog",       href: "/blog"       },
     ],
     /** Short text/wordmark on the left of the navbar. */
     wordmark: "Archit Gupta",
     /** Path to the downloadable resume PDF in /public. */
     resumeHref: "/resume.pdf",
+    /** File name the browser saves the resume download as. */
+    resumeFileName: "Archit_Gupta_Resume.pdf",
   },
 
   /** Hero — the first thing visitors see. */
@@ -266,7 +267,7 @@ export const site = {
           suffix: "+",
         },
         bullets: [
-          "Facilitated weekly recitations for 100+ students, raising exam scores by an average of 10 points across sections.",
+          "Facilitated weekly recitations for 100+ students, supporting a 15% rise in average exam scores.",
           "Developed 20+ visual code examples and presentations bridging mathematical theory with applied implementation.",
           "Held office hours and provided targeted feedback on assignments covering logic, set theory, graph theory, and combinatorics.",
         ],
@@ -578,7 +579,7 @@ export const site = {
       },
       {
         q: "Where can I see more, and what's the fastest way to reach you?",
-        a: "<strong>GitHub</strong>: <a href=\"https://github.com/archit2901\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"faq-link\">github.com/archit2901</a>, with 11 repos including the projects on this site. The <a href=\"/projects\" class=\"faq-link\">/projects page</a> here has the full list. The fastest way to reach me is <strong>email</strong>: <a href=\"mailto:gupta.archit1@northeastern.edu\" class=\"faq-link\">gupta.archit1@northeastern.edu</a>, and I respond within 24 hours on weekdays. LinkedIn DMs work too. I'm up for a 25-minute intro call or jumping straight into a technical screen.",
+        a: "<strong>GitHub</strong>: <a href=\"https://github.com/archit2901\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"faq-link\">github.com/archit2901</a>, including the projects on this site. The <a href=\"/projects\" class=\"faq-link\">/projects page</a> here has the full list. The fastest way to reach me is <strong>email</strong>: <a href=\"mailto:gupta.archit1@northeastern.edu\" class=\"faq-link\">gupta.archit1@northeastern.edu</a>, and I respond within 24 hours on weekdays. LinkedIn DMs work too. I'm up for a 25-minute intro call or jumping straight into a technical screen.",
         accent: "violet",
       },
     ],
@@ -678,12 +679,10 @@ export const site = {
     ],
   },
 
-  /** Build stamp shown in the site footer. Update by hand on each major build. */
+  /** Build stamp shown in the site footer. The "last updated" date is set at build time. */
   build: {
     version: "0.1.0",
     framework: "astro 5",
-    jsGzipKb: 121,
-    lastBuiltDate: "Jun 18 2026",
     repoUrl: "https://github.com/archit2901/portfolio",
   },
 

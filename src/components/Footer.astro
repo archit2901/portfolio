@@ -2,6 +2,12 @@
 import { site } from '~/content/site';
 
 const b = site.build;
+// Stamped at build time so it never goes stale
+const lastUpdated = new Date().toLocaleDateString('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+});
 ---
 
 <footer class="relative mt-16 sm:mt-24 border-t border-border-subtle/50 px-5 sm:px-8 py-6 mx-auto w-full max-w-container">
@@ -24,9 +30,7 @@ const b = site.build;
     <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>
     <li>built with {b.framework}</li>
     <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>
-    <li>{b.jsGzipKb}kb js (gz)</li>
-    <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>
-    <li>last updated {b.lastBuiltDate}</li>
+    <li>last updated {lastUpdated}</li>
     {b.repoUrl && (
       <>
         <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>

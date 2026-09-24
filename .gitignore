@@ -24,3 +24,6 @@ pnpm-debug.log*
 
 # misc
 *.tsbuildinfo
+
+# Lighthouse CI local reports
+.lighthouseci/

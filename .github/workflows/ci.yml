@@ -60,6 +60,8 @@ jobs:
         with:
           configPath: ./lighthouserc.json
           uploadArtifacts: true
+          # Each run needs its own artifact name; a repeat is a 409 Conflict.
+          artifactName: lighthouse-mobile
           temporaryPublicStorage: true
 
       - name: Lighthouse (desktop)
@@ -67,4 +69,5 @@ jobs:
         with:
           configPath: ./lighthouserc.desktop.json
           uploadArtifacts: true
+          artifactName: lighthouse-desktop
           temporaryPublicStorage: true

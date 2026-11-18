@@ -1,51 +1,33 @@
 ---
-import { site } from '~/content/site';
+import { profile } from '~/data/profile';
 
-const b = site.build;
-// Stamped at build time so it never goes stale
-const lastUpdated = new Date().toLocaleDateString('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-});
+const updated = new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'America/New_York' });
 ---
 
-<footer class="relative mt-16 sm:mt-24 border-t border-border-subtle/50 px-5 sm:px-8 py-6 mx-auto w-full max-w-container">
-  {/* Recruiter-facing CTA above the build stamp */}
-  <p class="font-mono text-[11.5px] text-text-muted mb-2">
-    <span class="inline-flex items-center gap-1.5">
-      <span class="block w-1.5 h-1.5 rounded-full bg-accent wordmark-dot" aria-hidden="true"></span>
-      <span>Open to roles · Boston, ET</span>
-    </span>
+<footer class="ft">
+  <p class="engraved">{profile.name} · Boston, MA</p>
+  <p class="engraved ft-right">
+    <span>Updated {updated}</span>
+    <a href="/uses">Uses</a>
+    <a href="https://github.com/archit2901/portfolio" target="_blank" rel="noopener noreferrer">Source</a>
   </p>
-
-  {/* Build stamp */}
-  <ul class="flex flex-wrap items-center gap-x-3 gap-y-1.5 list-none p-0 m-0 font-mono text-[11px] text-text-faint leading-relaxed">
-    <li class="inline-flex items-center gap-1.5">
-      <span class="text-accent/70 select-none" aria-hidden="true">$</span>
-      <span>archit-portfolio</span>
-    </li>
-    <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>
-    <li>v{b.version}</li>
-    <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>
-    <li>built with {b.framework}</li>
-    <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>
-    <li>last updated {lastUpdated}</li>
-    {b.repoUrl && (
-      <>
-        <li class="text-text-faint/60 select-none" aria-hidden="true">·</li>
-        <li>
-          <a
-            href={b.repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-1 text-text-muted hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
-          >
-            <span aria-hidden="true">↗</span>
-            <span>github</span>
-          </a>
-        </li>
-      </>
-    )}
-  </ul>
 </footer>
+
+<style>
+  .ft {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+    padding: 1.5rem var(--pad) 1.75rem;
+    border-top: 1px solid rgb(var(--seam));
+    box-shadow: inset 0 1px 0 rgb(var(--seam-hi));
+  }
+  .ft p { margin: 0; }
+  .ft-right { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+  .ft a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .ft a:hover { color: rgb(var(--ink)); text-decoration: underline; }
+</style>

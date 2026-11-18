@@ -1,131 +1,113 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import ProjectCard from '~/components/projects/ProjectCard.astro';
-import ProjectsRuntime from '~/components/projects/ProjectsRuntime.astro';
-import { site } from '~/content/site';
+import ProjectRow from '~/components/projects/ProjectRow.astro';
+import Icon from '~/components/Icon.astro';
+import { projects, projectCategories, featuredOrder } from '~/data/projects';
+import { profile } from '~/data/profile';
 
-const { projects } = site;
-const all = projects.items;
-const totalAll = all.length;
-
-// Counts per category for the filter chips
-const countByCategory: Record<string, number> = {};
-for (const item of all) {
-  countByCategory[item.category] = (countByCategory[item.category] ?? 0) + 1;
-}
-
-const pageTitle = `${site.name} — Projects`;
-const pageDescription = `${all.length} projects from Archit Gupta — full-stack engineering, AI tools, and creative coding.`;
+// Featured first (in featured order), then the rest as listed.
+const ordered = [
+  ...featuredOrder.map((slug) => projects.find((p) => p.slug === slug)).filter((p) => p !== undefined),
+  ...projects.filter((p) => !featuredOrder.includes(p.slug)),
+];
+const counts = Object.fromEntries(projectCategories.map((c) => [c.key, projects.filter((p) => p.category === c.key).length]));
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription}>
-  <section
-    data-visible="false"
-    class="projects-page relative isolate overflow-hidden px-5 sm:px-8 py-16 md:py-24 mx-auto w-full max-w-container"
-  >
-    {/* Atmospheric backdrop */}
-    <div class="pj-grid" aria-hidden="true"></div>
-    <div class="pj-blob" aria-hidden="true"></div>
-
-    {/* Back to home */}
-    <p data-reveal="0" class="reveal">
-      <a
-        href="/"
-        class="back-link group inline-flex items-center gap-1.5 font-mono text-[12px] text-text-faint hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-sm"
-      >
-        <span class="back-arrow" aria-hidden="true">←</span>
-        <span>Back to home</span>
-      </a>
-    </p>
-
-    {/* Section label */}
-    <p
-      data-reveal="1"
-      class="reveal font-mono text-xs text-text-faint tracking-wider mt-8 mb-4"
-    >
-      <span class="text-accent/80">{projects.sectionLabel.split('·')[0].trim()}</span>
-      <span class="mx-1.5 text-text-faint/70">·</span>
-      <span>{projects.sectionLabel.split('·')[1]?.trim() ?? 'Projects'}</span>
-    </p>
-
-    {/* Heading + underline */}
-    <h1
-      data-reveal="2"
-      class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
-    >
-      {projects.pageHeading}
-    </h1>
-    <span data-reveal="3" class="reveal pj-underline" aria-hidden="true"></span>
-
-    {/* Filter chips */}
-    <div
-      data-reveal="4"
-      class="reveal mt-10 flex flex-wrap items-center gap-2"
-      role="tablist"
-      aria-label="Filter projects by category"
-    >
-      <button type="button" data-pj-filter="all" data-active="true" class="pj-chip">
-        All <span class="text-text-faint/60 ml-1">{totalAll}</span>
-      </button>
-      {
-        projects.categories.map((c) => (
-          <button type="button" data-pj-filter={c.key} data-active="false" class="pj-chip">
-            {c.title} <span class="text-text-faint/60 ml-1">{countByCategory[c.key] ?? 0}</span>
-          </button>
-        ))
-      }
+<BaseLayout
+  title={`Projects | ${profile.name}`}
+  description={`All projects by ${profile.name}: agentic RAG, real-time data pipelines, Go services, and web apps.`}
+>
+  <section class="pp" aria-labelledby="pp-title">
+    <a href="/" class="pp-back"><Icon name="arrow-right" size={16} class="pp-back-ico" />Home</a>
+    <div class="pp-head">
+      <h1 id="pp-title" class="h-section">Projects</h1>
+      <div class="pp-filter well" role="group" aria-label="Filter by category">
+        <button type="button" class="pp-opt" aria-pressed="true" data-filter="all">All <span class="figure">{projects.length}</span></button>
+        {projectCategories.map((c) => (
+          <button type="button" class="pp-opt" aria-pressed="false" data-filter={c.key}>{c.title} <span class="figure">{counts[c.key]}</span></button>
+        ))}
+      </div>
     </div>
-
-    {/* Full project grid */}
-    <ul class="mt-5 md:mt-6 list-none p-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-      {
-        all.map((p, i) => (
-          <ProjectCard project={p} index={i} total={totalAll} staggerIndex={i} />
-        ))
-      }
-    </ul>
+    <p class="pp-count engraved" aria-live="polite" data-pp-count>{projects.length} projects</p>
+    <div class="pp-list" data-pp-list>
+      {ordered.map((p) => <ProjectRow project={p} level="h2" />)}
+    </div>
   </section>
 </BaseLayout>
 
-<ProjectsRuntime />
+<script is:inline>
+  (() => {
+    const opts = Array.from(document.querySelectorAll('[data-filter]'));
+    const rows = Array.from(document.querySelectorAll('[data-pp-list] .pr'));
+    const count = document.querySelector('[data-pp-count]');
+    const apply = (key) => {
+      let n = 0;
+      rows.forEach((r) => {
+        const show = key === 'all' || r.getAttribute('data-category') === key;
+        r.hidden = !show;
+        if (show) n += 1;
+      });
+      opts.forEach((o) => o.setAttribute('aria-pressed', String(o.dataset.filter === key)));
+      if (count) count.textContent = n + (n === 1 ? ' project' : ' projects');
+    };
+    opts.forEach((o) => o.addEventListener('click', () => apply(o.dataset.filter || 'all')));
+  })();
+</script>
 
-<style is:global>
-  /* Filter chip styles + back-link arrow micro-anim (kept page-local). */
-  .pj-chip {
+<style>
+  .pp {
+    padding: clamp(2rem, 4vw, 3.5rem) var(--pad) clamp(3rem, 6vw, 5rem);
+  }
+  .pp-back {
     display: inline-flex;
     align-items: center;
-    padding: 6px 12px;
-    border-radius: 9999px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 12px;
-    color: #9ca3af;
-    background-color: rgba(17, 17, 17, 0.4);
-    border: 1px solid #222222;
-    transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: rgb(var(--ink-2));
+    text-decoration: none;
+    padding: 0.5rem 0;
+  }
+  .pp-back:hover { color: rgb(var(--ink)); }
+  .pp-back :global(.pp-back-ico) { transform: rotate(180deg); }
+  .pp-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-top: 1rem;
+  }
+  .pp-filter {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.3125rem;
+    border-radius: 0.875rem;
+  }
+  .pp-opt {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.375rem;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.875rem;
+    border: 0;
+    border-radius: 0.625rem;
+    background: transparent;
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: rgb(var(--ink-2));
     cursor: pointer;
+    transition: background-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
   }
-  .pj-chip:hover {
-    color: #ededed;
-    border-color: rgba(34, 211, 238, 0.35);
+  .pp-opt .figure { font-size: 0.8125rem; color: rgb(var(--ink-3)); }
+  .pp-opt[aria-pressed='true'] {
+    background: rgb(var(--raised));
+    box-shadow: var(--shadow-key);
+    color: rgb(var(--ink));
   }
-  .pj-chip[data-active='true'] {
-    color: #22d3ee;
-    background-color: rgba(34, 211, 238, 0.08);
-    border-color: rgba(34, 211, 238, 0.45);
-  }
-  .pj-chip:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.7), 0 0 0 4px #0a0a0a;
-  }
-
-  .back-arrow {
-    display: inline-block;
-    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .back-link:hover .back-arrow {
-    transform: translateX(-3px);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .back-arrow { transition: none; transform: none !important; }
-  }
+  .pp-count { margin: 2rem 0 0; }
+  .pp-list { margin-top: 1rem; }
+  .pp-list :global(.pr[hidden]) { display: none; }
 </style>

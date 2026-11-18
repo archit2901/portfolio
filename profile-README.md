@@ -12,18 +12,11 @@
 
 ### Hi, I'm Archit 👋
 
-Full-stack software engineer · MSCS @ Northeastern · Boston
+Full-stack & AI engineer · MS CS @ Northeastern (graduating May 2027) · Boston
 
-I build polished web products end-to-end — APIs, infra, and pixels. Most recently a co-op at **Abacus Health Solutions**, building a patient-facing web portal in React and TypeScript. Previously **2.5 years at Ernst & Young**, where I engineered the user-facing app for EY.AI (400k+ users, 99.9% uptime).
+I build web products and AI systems end to end: React front ends, cloud backends, and LLM agents that hold up in production. Most recently a Software Engineer Intern at **Abacus Health Solutions**, where I helped migrate a legacy ASP.NET portal to React and TypeScript and brought dashboard load times from 8–9 seconds to under 1 second. Before that, **2.5 years at Ernst & Young**, where I built the user-facing app for EY.AI (400,000+ employees, 99.9% uptime). Today I'm an AI Instructional Assistant at Northeastern's CATLR.
 
-**Open for full-time roles starting May 2027.**
-
-```text
-$ whoami
-archit — full-stack engineer (frontend, backend, infra)
-$ ls ./focus
-typescript/  react/  next.js/  go/  node/  python/  postgres/  aws/  systems-design/
-```
+**Open to full-time 2027 roles.**
 
 ---
 
@@ -35,9 +28,10 @@ typescript/  react/  next.js/  go/  node/  python/  postgres/  aws/  systems-des
 
 ### Recent projects
 
-- 🔗 **[url-shortener](https://github.com/archit2901/url-shortener)** — Production-grade URL shortener in Go + Postgres + Redis + Sentry. Cache-aside redirects, base62 short codes, CI workflow, testcontainers integration tests.
-- 🌊 **[sentiment-aura](https://github.com/archit2901/sentiment-aura)** — Real-time speech-sentiment visualized as a Perlin-noise aura. React + FastAPI + Deepgram + Claude Sonnet 4. [Live demo →](https://sentiment-aura-eight.vercel.app)
-- 📄 **[resume-to-portfolio](https://github.com/archit2901/resume-to-portfolio)** — Upload a resume, get a portfolio site back. Next.js 14 + Claude API.
+- 📍 **[siteline](https://github.com/archit2901/siteline)**: built at HackPrinceton Fall 2026 (Business + Enterprise track). An AI agent that tells any business where in Houston to open its next location, scoring every H3 hexagon with a Huff model and ranking real CoStar lease spaces, with every number verified against its source.
+- 📈 **SEC Filings Research Agent**: an agentic RAG system over NVIDIA, AMD, and Micron SEC filings (LangGraph, Pinecone, Cohere reranking). An early-stopping agent cut model calls by 43% and latency by half versus a baseline.
+- 🌊 **[market-stream](https://github.com/archit2901/market-stream)**: a real-time market data pipeline that merges CoinGecko and Finnhub into one deduplicated Kafka event stream, with event-time rolling windows in Redis.
+- 🔗 **[url-shortener](https://github.com/archit2901/url-shortener)**: production-grade URL shortener in Go + Postgres + Redis + Sentry. Cache-aside redirects, base62 short codes, CI workflow, testcontainers integration tests.
 
 Browse all on [architgupta.me/projects →](https://architgupta.me/projects)
 
@@ -46,10 +40,10 @@ Browse all on [architgupta.me/projects →](https://architgupta.me/projects)
 ### Stack
 
 ```
-TypeScript · JavaScript · Python · Go · Java · C++ · SQL
-React · Next.js · Node.js · Express · FastAPI · GraphQL · Tailwind CSS
-PostgreSQL · MySQL · MongoDB · Redis · SQL Server · Supabase
-AWS · Azure DevOps · Docker · Kubernetes · GitHub Actions · Datadog · Sentry
-Jest · Cypress · Playwright · Vitest · Postman
-Claude Code · GitHub Copilot
+Python · Java · JavaScript · TypeScript · C++ · C# · Go · SQL
+LangGraph · LangChain · RAG · OpenAI API · Claude API · Pinecone · Cohere · LLM Evals
+React · Next.js · Node.js · Express · ASP.NET · FastAPI · GraphQL · Tailwind CSS
+PostgreSQL · MySQL · SQL Server · MongoDB · Redis · Supabase · Kafka
+AWS · Azure DevOps · Terraform · Docker · Kubernetes · GitHub Actions
+pytest · Playwright · Vitest · Jest · Sentry · CloudWatch
 ```

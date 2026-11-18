@@ -1,80 +1,224 @@
 ---
-import { site } from '~/content/site';
-import ProjectCard from './ProjectCard.astro';
-import ProjectsRuntime from './ProjectsRuntime.astro';
-import AnchorLink from '~/components/AnchorLink.astro';
+/**
+ * Featured projects with a tuning dial. The dial sticks under the nav while
+ * the rows scroll; its needle glides between stations in step with the
+ * scroll, and each station is a link to its project row.
+ */
+import { featuredProjects, projects } from '~/data/projects';
+import { sectionById } from '~/data/sections';
+import SectionHeading from '~/components/SectionHeading.astro';
+import ProjectRow from '~/components/projects/ProjectRow.astro';
+import Icon from '~/components/Icon.astro';
 
-const { projects } = site;
-const featured = projects.items.filter((p) => p.featured).slice(0, 3);
+const s = sectionById('projects');
+const n = featuredProjects.length;
 ---
 
-<section
-  id="projects"
-  data-visible="false"
-  class="projects-section relative isolate overflow-hidden border-t border-border-subtle/40 px-5 sm:px-8 py-16 sm:py-24 md:py-32 mx-auto w-full max-w-container"
->
-  {/* Atmospheric backdrop */}
-  <div class="pj-grid" aria-hidden="true"></div>
-  <div class="pj-blob" aria-hidden="true"></div>
+<section id={s.id} class="module pj" aria-labelledby={`${s.id}-title`}>
+  <div class="pj-head">
+    <SectionHeading id={s.id} text={s.heading} />
+    <a class="key" href="/projects">All {projects.length} projects<Icon name="arrow-right" size={16} /></a>
+  </div>
 
-  {/* Section label */}
-  <p
-    data-reveal="0"
-    class="reveal font-mono text-xs text-text-faint tracking-wider mb-4"
-  >
-    <span class="text-accent/80">{projects.sectionLabel.split('·')[0].trim()}</span>
-    <span class="mx-1.5 text-text-faint/70">·</span>
-    <span>{projects.sectionLabel.split('·')[1]?.trim() ?? 'Projects'}</span>
-  </p>
+  <nav class="tuner" aria-label="Featured projects" data-tuner style={`--n:${n}`}>
+    <div class="tuner-glass well">
+      <ol class="tuner-stations">
+        {featuredProjects.map((p, i) => (
+          <li style={`--i:${i}`}>
+            <a href={`#project-${p.slug}`} data-station={i}>
+              <span class="tuner-tick" aria-hidden="true"></span>
+              <span class="figure tuner-num" aria-hidden="true">{i + 1}</span>
+              <span class="tuner-name">{p.short ?? p.name}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <span class="tuner-scale" aria-hidden="true"></span>
+      <span class="tuner-needle" aria-hidden="true" data-needle><span class="tuner-lamp"></span></span>
+    </div>
+  </nav>
 
-  {/* Display heading + animated underline */}
-  <h2
-    data-reveal="1"
-    class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
-  >
-    <span>{projects.landingHeading}</span>
-    <AnchorLink for="projects" />
-  </h2>
-  <span data-reveal="2" class="reveal pj-underline" aria-hidden="true"></span>
-
-  {/* Featured cards */}
-  <ul class="mt-12 md:mt-14 list-none p-0 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-    {
-      featured.map((p, i) => (
-        <ProjectCard
-          project={p}
-          index={i}
-          total={featured.length}
-          revealIndex={3 + i}
-        />
-      ))
-    }
-  </ul>
-
-  {/* "Browse all" link */}
-  <p data-reveal="6" class="reveal mt-8 md:mt-10 text-center">
-    <a
-      href="/projects"
-      class="browse-all group inline-flex items-center gap-2 px-4 py-2 rounded-full font-mono text-[13px] text-text-muted border border-border-subtle hover:text-accent hover:border-accent/50 hover:bg-accent/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-    >
-      <span>{projects.browseAllLabel}</span>
-      <span class="browse-arrow" aria-hidden="true">→</span>
-      <span class="font-mono text-text-faint/70 ml-1">({projects.items.length})</span>
-    </a>
-  </p>
+  <div class="pj-list" data-pj-list>
+    {featuredProjects.map((p) => <ProjectRow project={p} />)}
+  </div>
 </section>
 
-<ProjectsRuntime />
+<script is:inline>
+  (() => {
+    const tuner = document.querySelector('[data-tuner]');
+    const list = document.querySelector('[data-pj-list]');
+    if (!tuner || !list) return;
+    const needle = tuner.querySelector('[data-needle]');
+    const stations = Array.from(tuner.querySelectorAll('[data-station]'));
+    const rows = Array.from(list.querySelectorAll('.pr'));
+    const n = rows.length;
+    if (!needle || !n) return;
 
-<style is:global>
-  .browse-arrow {
-    display: inline-block;
-    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const focus = window.innerHeight * 0.45;
+      const anchors = rows.map((r) => r.getBoundingClientRect().top + 48);
+      let p = 0;
+      if (focus <= anchors[0]) p = 0;
+      else if (focus >= anchors[n - 1]) p = n - 1;
+      else {
+        for (let i = 0; i < n - 1; i++) {
+          if (focus >= anchors[i] && focus < anchors[i + 1]) {
+            p = i + (focus - anchors[i]) / (anchors[i + 1] - anchors[i]);
+            break;
+          }
+        }
+      }
+      needle.style.setProperty('--p', String(p));
+      const near = Math.round(p);
+      const tuned = Math.abs(p - near) < 0.18;
+      tuner.toggleAttribute('data-tuned', tuned);
+      stations.forEach((a, i) => {
+        if (tuned && i === near) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      });
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+
+    // Only listen while the section is near the viewport.
+    const section = tuner.closest('section');
+    const io = new IntersectionObserver((entries) => {
+      const on = entries[0].isIntersecting;
+      if (on) { window.addEventListener('scroll', onScroll, { passive: true }); update(); }
+      else window.removeEventListener('scroll', onScroll);
+    }, { rootMargin: '20% 0px 20% 0px' });
+    io.observe(section);
+    window.addEventListener('resize', onScroll);
+    update();
+  })();
+</script>
+
+<style>
+  .pj-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
-  .browse-all:hover .browse-arrow {
-    transform: translateX(4px);
+
+  /* The dial: a glass window with an engraved scale, stations and a needle. */
+  .tuner {
+    position: sticky;
+    top: var(--nav-h);
+    z-index: 5;
+    margin: 2rem calc(-1 * var(--pad)) 0;
+    padding: 0.75rem var(--pad);
+    background: rgb(var(--plate));
   }
-  @media (prefers-reduced-motion: reduce) {
-    .browse-arrow { transition: none; transform: none !important; }
+  .tuner-glass {
+    position: relative;
+    height: 4.25rem;
+    border-radius: 0.875rem;
+    overflow: hidden;
+  }
+  .tuner-scale {
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.5rem;
+    height: 0.75rem;
+    background-image: repeating-linear-gradient(90deg, rgb(var(--ink-3) / 0.45) 0 1px, transparent 1px 10px);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .tuner-stations {
+    position: absolute;
+    inset: 0 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tuner-stations li {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc((var(--i) + 0.5) / var(--n) * 100%);
+    transform: translateX(-50%);
+  }
+  .tuner-stations a {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 0.375rem;
+    height: 100%;
+    padding: 0.75rem 0.5rem 0;
+    color: rgb(var(--ink-3));
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    font-weight: 640;
+    font-stretch: 80%;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 200ms ease;
+  }
+  .tuner-stations a:hover,
+  .tuner-stations a[aria-current='true'] { color: rgb(var(--ink)); }
+  .tuner-tick {
+    position: absolute;
+    left: 50%;
+    bottom: 0.5rem;
+    width: 2px;
+    height: 1.375rem;
+    margin-left: -1px;
+    border-radius: 1px;
+    background: rgb(var(--ink-3) / 0.7);
+  }
+  .tuner-num { font-size: 0.6875rem; }
+  /* Phones show station numbers; the name stays for screen readers. */
+  .tuner-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .tuner-needle {
+    --p: 0;
+    position: absolute;
+    top: 2.25rem;
+    bottom: 0.375rem;
+    left: calc(0.75rem + (var(--p) + 0.5) / var(--n) * (100% - 1.5rem));
+    width: 2px;
+    margin-left: -1px;
+    border-radius: 1px;
+    background: rgb(var(--ink));
+    box-shadow: 1px 0 0 rgb(var(--seam-hi) / 0.6);
+    pointer-events: none;
+  }
+  .tuner-lamp {
+    position: absolute;
+    left: 50%;
+    top: -0.3125rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-left: -0.25rem;
+    border-radius: 999px;
+    background: rgb(var(--led-off));
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.18);
+    transition: background-color 160ms ease;
+  }
+  /* Lit only while a station is actually tuned in: "this one, now". */
+  .tuner[data-tuned] .tuner-lamp {
+    background: rgb(var(--accent));
+    box-shadow: inset 0 -1px 1px rgb(0 0 0 / 0.18), inset 0 1px 1px rgb(255 255 255 / 0.45);
+  }
+
+  .pj-list { margin-top: 1rem; }
+  .pj-list > :global(.pr:last-child) { padding-bottom: 0; }
+  .pj-list > :global(.pr) { scroll-margin-top: calc(var(--nav-h) + 6.5rem); }
+
+  @media (min-width: 640px) {
+    .tuner-name { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+    .tuner-num { color: rgb(var(--ink-3)); }
   }
 </style>

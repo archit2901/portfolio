@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1440">
+<title>Instrument Faceplate sketch</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;background:#E3E3DF;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#1B1C1E}
+.plate{position:absolute;inset:28px 40px;background:#F1F1EE;border-radius:30px;box-shadow:inset 0 1px 0 #fff,inset 0 -2px 0 #d6d6d1,0 1px 2px rgba(0,0,0,.08),0 18px 40px -24px rgba(0,0,0,.25);overflow:hidden}
+.seam{position:absolute;left:0;right:0;height:1px;background:#D8D8D3}
+nav{position:absolute;top:0;left:0;right:0;height:72px;display:flex;align-items:center;padding:0 48px;gap:28px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#6B6E73}
+nav b{color:#1B1C1E;font-weight:700;letter-spacing:.02em;text-transform:none;font-size:16px;margin-right:auto}
+nav .n{color:#9A9DA2;margin-right:4px}
+.switch{display:flex;align-items:center;gap:10px;font-size:11px}
+.track{width:54px;height:24px;border-radius:12px;background:#DADAD5;box-shadow:inset 0 1px 2px rgba(0,0,0,.18);position:relative}
+.track:after{content:"";position:absolute;left:3px;top:3px;width:24px;height:18px;border-radius:9px;background:#FAFAF8;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.kbd{border-radius:8px;background:#FAFAF8;box-shadow:0 1px 0 #cfcfca,0 2px 3px rgba(0,0,0,.08);padding:6px 10px;font-size:12px;color:#1B1C1E}
+.left{position:absolute;left:48px;top:120px;width:640px}
+.label{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#6B6E73;margin-bottom:22px}
+h1{font-size:112px;line-height:.92;font-weight:700;letter-spacing:-.035em}
+.role{font-size:40px;font-weight:500;letter-spacing:-.02em;margin-top:18px}
+.tag{font-size:19px;line-height:1.5;color:#45484D;margin-top:22px;max-width:560px}
+.readout{margin-top:34px;background:#DCDDD7;border-radius:14px;box-shadow:inset 0 2px 4px rgba(0,0,0,.16);padding:18px 22px;display:flex;align-items:center;gap:14px;font-size:15px;font-variant-numeric:tabular-nums}
+.led{width:10px;height:10px;border-radius:50%;background:#E2580B;box-shadow:0 0 0 3px rgba(226,88,11,.18)}
+.links{margin-top:22px;display:flex;gap:10px}
+.right{position:absolute;right:48px;top:120px;width:600px}
+.grille{height:96px;border-radius:14px;margin-bottom:22px;background-image:radial-gradient(circle,#C9C9C3 2.2px,transparent 2.6px);background-size:14px 14px;opacity:.9}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.key{height:116px;border-radius:14px;background:#FAFAF8;box-shadow:0 1px 0 #cfcfca,0 3px 6px -2px rgba(0,0,0,.14);padding:14px;display:flex;flex-direction:column;justify-content:space-between}
+.key .v{font-size:30px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.key .v small{font-size:18px;color:#8A8D92;font-weight:500}
+.key .l{font-size:12px;line-height:1.3;color:#6B6E73}
+.actions{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:12px;margin-top:12px}
+.act{height:64px;border-radius:14px;background:#2B2D30;color:#F1F1EE;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;box-shadow:0 2px 0 #121314}
+.act.primary{background:#E2580B;color:#fff;box-shadow:0 2px 0 #A33F06}
+.foot{position:absolute;left:48px;right:48px;bottom:22px;display:flex;justify-content:space-between;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#9A9DA2}
+</style></head><body>
+<div class="plate">
+  <nav><b>Archit Gupta</b>
+    <span><span class="n">01</span>About</span><span><span class="n">02</span>Experience</span><span><span class="n">03</span>Projects</span><span><span class="n">04</span>Skills</span><span><span class="n">05</span>Contact</span>
+    <span class="switch">Light<span class="track"></span>Dark</span><span class="kbd">⌘K</span>
+  </nav>
+  <div class="seam" style="top:72px"></div>
+  <div class="left">
+    <div class="label">Hi, I'm</div>
+    <h1>Archit<br>Gupta</h1>
+    <div class="role">Full-stack &amp; AI engineer.</div>
+    <p class="tag">I build web products and AI systems end to end: React front ends, cloud backends, and LLM agents that hold up in production.</p>
+    <div class="readout"><span class="led"></span>MS CS @ Northeastern · Graduating May 2027 · Open to full-time 2027 roles</div>
+    <div class="links"><span class="kbd">GitHub</span><span class="kbd">LinkedIn</span><span class="kbd">Email</span></div>
+  </div>
+  <div class="right">
+    <div class="grille"></div>
+    <div class="keys">
+      <div class="key"><span class="v">400K+</span><span class="l">employees using EY.AI</span></div>
+      <div class="key"><span class="v">&lt;1s <small>8–9s</small></span><span class="l">dashboard load time at Abacus</span></div>
+      <div class="key"><span class="v">90%+</span><span class="l">faster request handling</span></div>
+      <div class="key"><span class="v">70%</span><span class="l">less review time</span></div>
+      <div class="key"><span class="v">60%</span><span class="l">faster deployments</span></div>
+      <div class="key"><span class="v">43%</span><span class="l">fewer model calls</span></div>
+      <div class="key"><span class="v">50+</span><span class="l">client companies served</span></div>
+      <div class="key"><span class="v">100+</span><span class="l">students taught</span></div>
+    </div>
+    <div class="actions"><div class="act">View projects</div><div class="act">Get in touch</div><div class="act primary">Download résumé</div></div>
+  </div>
+  <div class="foot"><span>Boston, MA</span><span>architgupta.me</span></div>
+</div>
+</body></html>

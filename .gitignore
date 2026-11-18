@@ -27,3 +27,8 @@ pnpm-debug.log*
 
 # Lighthouse CI local reports
 .lighthouseci/
+
+# Local review artifacts (screenshots, browser logs)
+.playwright-mcp/
+.impeccable/review/
+.impeccable/questions/

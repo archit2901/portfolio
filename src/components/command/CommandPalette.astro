@@ -1,229 +1,192 @@
 ---
-import { site } from '~/content/site';
-
 /**
- * Static list of palette actions, computed at build time from the content
- * file. Each item ships its kind (navigate / open / download / toggle),
- * label, optional hint key chord, and target / handler key.
+ * ⌘K command palette. Items are computed at build time from src/data;
+ * the runtime below handles fuzzy search, keyboard nav and g-chords.
  */
+import { sections } from '~/data/sections';
+import { links } from '~/data/profile';
+
 type PaletteItem =
-  | { kind: 'navigate'; label: string; target: string; hint?: string; group: 'Navigate' }
-  | { kind: 'open';     label: string; href: string;   hint?: string; group: 'Open' }
-  | { kind: 'download'; label: string; href: string;   filename: string; hint?: string; group: 'Download' }
-  | { kind: 'toggle';   label: string; action: string; hint?: string; group: 'Preferences' };
+  | { kind: 'navigate'; label: string; target: string; hint?: string; group: 'Go to' }
+  | { kind: 'open'; label: string; href: string; group: 'Open' }
+  | { kind: 'download'; label: string; href: string; filename: string; group: 'Open' }
+  | { kind: 'copy'; label: string; text: string; group: 'Actions' }
+  | { kind: 'toggle'; label: string; action: 'theme' | 'reduce-motion' | 'replay'; group: 'Actions' };
 
-// Map nav links to chord hints — letter after `g` that scrolls to that section.
-const NAV_HINT: Record<string, string> = {
-  about: 'g a',
-  experience: 'g e',
-  skills: 'g s',
-  projects: 'g p',
-  education: 'g d',
-  faq: 'g f',
-  contact: 'g c',
-};
-
-/** When off-home, anchor targets become `/#anchor` so activating a navigate
- *  item from /projects goes back to the home page and scrolls correctly. */
 const isHome = Astro.url.pathname === '/' || Astro.url.pathname === '';
 const prefix = (anchor: string) => (isHome ? anchor : `/${anchor}`);
 
 const items: PaletteItem[] = [
-  { kind: 'navigate', group: 'Navigate', label: 'Top of page', target: isHome ? '#__top' : '/', hint: 'g h' },
-  ...site.nav.links
-    .filter((l) => l.href.startsWith('#'))
-    .map((l): PaletteItem => ({
-      kind: 'navigate',
-      group: 'Navigate',
-      label: l.label,
-      target: prefix(l.href),
-      hint: NAV_HINT[l.href.slice(1)] ?? undefined,
-    })),
-  // Blog is /blog, not an anchor — render as "Open"
-  ...site.nav.links
-    .filter((l) => !l.href.startsWith('#'))
-    .map((l): PaletteItem => ({
-      kind: 'open',
-      group: 'Open',
-      label: l.label,
-      href: l.href,
-    })),
-  ...site.hero.socials.map((s): PaletteItem => ({
-    kind: 'open',
-    group: 'Open',
+  { kind: 'navigate', group: 'Go to', label: 'Top of page', target: isHome ? '#__top' : '/', hint: 'g h' },
+  ...sections.map((s): PaletteItem => ({
+    kind: 'navigate',
+    group: 'Go to',
     label: s.label,
-    href: s.href,
+    target: prefix(`#${s.id}`),
+    hint: s.chord ? `g ${s.chord}` : undefined,
   })),
-  { kind: 'download', group: 'Download', label: 'Résumé (PDF)', href: site.nav.resumeHref, filename: site.nav.resumeFileName },
-  { kind: 'toggle',   group: 'Preferences', label: 'Toggle reduced motion', action: 'reduce-motion' },
+  { kind: 'open', group: 'Open', label: 'All projects', href: '/projects' },
+  { kind: 'download', group: 'Open', label: 'Download résumé (PDF)', href: links.resume, filename: links.resumeFileName },
+  { kind: 'open', group: 'Open', label: 'GitHub', href: links.github },
+  { kind: 'open', group: 'Open', label: 'LinkedIn', href: links.linkedin },
+  { kind: 'open', group: 'Open', label: 'Email', href: `mailto:${links.email}` },
+  { kind: 'open', group: 'Open', label: 'Uses', href: '/uses' },
+  { kind: 'copy', group: 'Actions', label: 'Copy email address', text: links.email },
+  { kind: 'toggle', group: 'Actions', label: 'Toggle light / dark theme', action: 'theme' },
+  { kind: 'toggle', group: 'Actions', label: 'Toggle reduced motion', action: 'reduce-motion' },
+  { kind: 'toggle', group: 'Actions', label: 'Replay power-on', action: 'replay' },
 ];
+
+const chords = Object.fromEntries(
+  sections.filter((s) => s.chord).map((s) => [s.chord as string, `#${s.id}`]),
+);
 ---
 
-<div
-  id="cmd-palette"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Command palette"
-  data-open="false"
-  class="cmd-palette fixed inset-0 z-[100] pointer-events-none opacity-0 transition-opacity duration-150 data-[open=true]:opacity-100 data-[open=true]:pointer-events-auto"
->
-  {/* Backdrop */}
-  <div
-    class="cmd-backdrop absolute inset-0 bg-bg-base/70 backdrop-blur-md"
-    data-cmd-backdrop
-  ></div>
-
-  {/* Modal */}
-  <div class="absolute left-1/2 top-[15%] -translate-x-1/2 w-[92%] max-w-[560px]">
-    <div class="cmd-modal-wrap relative rounded-xl p-px">
-      <div class="cmd-modal relative rounded-xl bg-bg-subtle/90 backdrop-blur-xl border border-border-subtle shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] overflow-hidden">
-
-        {/* Search input */}
-        <div class="flex items-center gap-3 px-4 py-3 border-b border-border-subtle/70">
-          <span class="text-text-faint shrink-0" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="7"></circle>
-              <path d="m20 20-3-3"></path>
-            </svg>
-          </span>
-          <input
-            id="cmd-input"
-            type="text"
-            placeholder={site.commandPalette.placeholder}
-            autocomplete="off"
-            autocapitalize="off"
-            spellcheck="false"
-            class="flex-1 bg-transparent text-[14px] text-text-primary placeholder:text-text-faint focus:outline-none"
-          />
-          <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono text-text-faint border border-border-subtle/80 bg-bg-base/60">
-            esc
-          </kbd>
-        </div>
-
-        {/* Results list */}
-        <ul id="cmd-results" class="max-h-[380px] overflow-y-auto py-2 list-none m-0 p-0" role="listbox">
-          {/* Populated by JS */}
-        </ul>
-
-        {/* Empty state */}
-        <div
-          id="cmd-empty"
-          class="hidden px-4 py-8 text-center text-[13px] text-text-faint"
-        >
-          {site.commandPalette.noResults}
-        </div>
-
-        {/* Footer hints */}
-        <div class="flex items-center justify-between px-4 py-2 border-t border-border-subtle/70 text-[10px] font-mono text-text-faint">
-          <div class="flex items-center gap-3">
-            <span class="inline-flex items-center gap-1"><kbd class="cmd-kbd">↑</kbd><kbd class="cmd-kbd">↓</kbd> move</span>
-            <span class="inline-flex items-center gap-1"><kbd class="cmd-kbd">↵</kbd> select</span>
-            <span class="inline-flex items-center gap-1"><kbd class="cmd-kbd">esc</kbd> close</span>
-          </div>
-          <span class="inline-flex items-center gap-1">
-            <kbd class="cmd-kbd">⌘</kbd><kbd class="cmd-kbd">K</kbd>
-          </span>
-        </div>
-      </div>
+<div id="cmd-palette" role="dialog" aria-modal="true" aria-label="Command palette" data-open="false" class="cmd">
+  <div class="cmd-backdrop" data-cmd-backdrop></div>
+  <div class="cmd-panel">
+    <div class="cmd-search well">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+      <input
+        id="cmd-input"
+        type="text"
+        role="combobox"
+        aria-expanded="true"
+        aria-controls="cmd-results"
+        aria-autocomplete="list"
+        aria-label="Search sections and actions"
+        placeholder="Jump to a section or run an action"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+      <kbd class="cmd-kbd">esc</kbd>
+    </div>
+    <ul id="cmd-results" class="cmd-list" role="listbox" aria-label="Results"></ul>
+    <div id="cmd-empty" class="cmd-empty hidden">No matches. Try a section name.</div>
+    <div class="cmd-foot engraved">
+      <span><kbd class="cmd-kbd">↑</kbd><kbd class="cmd-kbd">↓</kbd> move</span>
+      <span><kbd class="cmd-kbd">↵</kbd> select</span>
+      <span><kbd class="cmd-kbd">g</kbd> then a letter jumps</span>
     </div>
   </div>
 </div>
 
 <style is:global>
-  /* Rotating conic-gradient border (mirrors Résumé button vibe) */
-  @property --cmd-angle {
-    syntax: '<angle>';
-    inherits: false;
-    initial-value: 0deg;
+  .cmd {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 140ms ease;
   }
-  .cmd-modal-wrap {
-    background: conic-gradient(
-      from var(--cmd-angle),
-      rgba(34, 211, 238, 0.55),
-      rgba(168, 85, 247, 0.4),
-      rgba(34, 211, 238, 0.55)
-    );
-    animation: cmd-angle-rot 10s linear infinite;
+  .cmd[data-open='true'] { opacity: 1; pointer-events: auto; }
+  .cmd-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(var(--desk) / 0.72);
+    backdrop-filter: blur(3px);
   }
-  @keyframes cmd-angle-rot { to { --cmd-angle: 360deg; } }
-
-  .cmd-kbd {
-    display: inline-flex;
+  .cmd-panel {
+    position: absolute;
+    left: 50%;
+    top: 14vh;
+    width: min(92vw, 36rem);
+    transform: translate(-50%, 6px);
+    padding: 0.75rem;
+    border-radius: 1.25rem;
+    background: rgb(var(--plate));
+    box-shadow: var(--shadow-plate), 0 30px 60px -30px rgb(0 0 0 / 0.45);
+    transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cmd[data-open='true'] .cmd-panel { transform: translate(-50%, 0); }
+  .cmd-search {
+    display: flex;
     align-items: center;
-    padding: 1px 5px;
-    border-radius: 3px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(0, 0, 0, 0.25);
-    color: #9ca3af;
+    gap: 0.75rem;
+    padding: 0 0.875rem;
+    color: rgb(var(--ink-3));
   }
-
-  /* Result row */
+  .cmd-search input {
+    flex: 1;
+    min-width: 0;
+    height: 3rem;
+    background: transparent;
+    border: 0;
+    font: inherit;
+    font-size: 1rem;
+    color: rgb(var(--ink));
+  }
+  .cmd-search input::placeholder { color: rgb(var(--ink-3)); }
+  .cmd-search input:focus { outline: none; }
+  .cmd-search:focus-within { box-shadow: var(--shadow-well), 0 0 0 3px rgb(var(--focus)); }
+  .cmd-list {
+    max-height: min(52vh, 24rem);
+    overflow-y: auto;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cmd-group-header {
+    padding: 0.75rem 0.75rem 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 640;
+    font-stretch: 78%;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgb(var(--ink-3));
+  }
   .cmd-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.625rem;
     cursor: pointer;
-    transition: background-color 100ms ease, color 100ms ease;
+    color: rgb(var(--ink-2));
   }
-  .cmd-item:hover,
   .cmd-item[data-active='true'] {
-    background-color: rgba(34, 211, 238, 0.08);
+    background: rgb(var(--raised));
+    box-shadow: var(--shadow-key);
+    color: rgb(var(--ink));
   }
-  .cmd-item[data-active='true'] .cmd-item-label {
-    color: #ededed;
+  .cmd-item-icon { display: inline-flex; color: rgb(var(--ink-3)); }
+  .cmd-item[data-active='true'] .cmd-item-icon { color: rgb(var(--ink)); }
+  .cmd-item-label { flex: 1; font-size: 0.9375rem; font-weight: 560; }
+  .cmd-item-hint { font-size: 0.75rem; font-weight: 600; color: rgb(var(--ink-3)); font-variant-numeric: tabular-nums; }
+  .cmd-empty { padding: 1.5rem 0.75rem; text-align: center; color: rgb(var(--ink-3)); }
+  .cmd-empty.hidden { display: none; }
+  .cmd-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    padding: 0.75rem 0.75rem 0.25rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid rgb(var(--seam));
+    box-shadow: inset 0 1px 0 rgb(var(--seam-hi));
   }
-  .cmd-item-icon {
-    width: 14px;
-    height: 14px;
-    color: #67e8f9;
-    flex-shrink: 0;
+  .cmd-kbd {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-  .cmd-item-icon svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-  .cmd-item-label {
-    flex: 1;
-    color: #9ca3af;
-    font-size: 14px;
-  }
-  .cmd-item-group {
-    color: #6b7280;
-    font-size: 10px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    flex-shrink: 0;
-  }
-  .cmd-item-hint {
-    color: #6b7280;
-    font-size: 10px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    flex-shrink: 0;
-  }
-
-  /* Group header */
-  .cmd-group-header {
-    padding: 8px 16px 4px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: #6b7280;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cmd-modal-wrap { animation: none; }
-    .cmd-palette { transition: none; }
+    min-width: 1.375rem;
+    height: 1.375rem;
+    padding: 0 0.3125rem;
+    margin-right: 0.25rem;
+    border-radius: 0.375rem;
+    background: rgb(var(--raised));
+    box-shadow: var(--shadow-key);
+    font-family: inherit;
+    font-size: 0.6875rem;
+    font-weight: 640;
+    color: rgb(var(--ink-2));
+    text-transform: none;
+    letter-spacing: 0;
   }
 </style>
 
-<script is:inline define:vars={{ items }}>
+<script is:inline define:vars={{ items, chords }}>
   // ── Palette state + DOM refs ─────────────────────────────────────────
   const palette = document.getElementById('cmd-palette');
   const input = /** @type {HTMLInputElement | null} */ (document.getElementById('cmd-input'));
@@ -267,7 +230,8 @@ const items: PaletteItem[] = [
       navigate: `<svg ${SVG_ATTRS}><path d="M9 6 15 12 9 18"/></svg>`,
       open:     `<svg ${SVG_ATTRS}><path d="M14 4 20 4 20 10"/><path d="M20 4 10 14"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></svg>`,
       download: `<svg ${SVG_ATTRS}><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>`,
-      toggle:   `<svg ${SVG_ATTRS}><circle cx="8" cy="12" r="3"/><path d="M16 12a3 3 0 1 0 0 0Z" fill="currentColor"/><rect x="3" y="8" width="18" height="8" rx="4"/></svg>`,
+      toggle:   `<svg ${SVG_ATTRS}><rect x="3" y="8" width="18" height="8" rx="4"/><circle cx="8" cy="12" r="2"/></svg>`,
+      copy:     `<svg ${SVG_ATTRS}><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg>`,
     };
 
     function render(query) {
@@ -314,7 +278,10 @@ const items: PaletteItem[] = [
       const rows = list.querySelectorAll('.cmd-item');
       rows.forEach((row, i) => {
         row.setAttribute('data-active', String(i === activeIndex));
+        row.setAttribute('aria-selected', String(i === activeIndex));
+        row.id = 'cmd-opt-' + i;
       });
+      input.setAttribute('aria-activedescendant', 'cmd-opt-' + activeIndex);
       const active = rows[activeIndex];
       if (active) active.scrollIntoView({ block: 'nearest' });
     }
@@ -354,6 +321,13 @@ const items: PaletteItem[] = [
         document.body.appendChild(a);
         a.click();
         a.remove();
+      } else if (it.kind === 'toggle' && it.action === 'replay') {
+        try { sessionStorage.removeItem('powered-on'); } catch (e) {}
+        window.location.href = '/';
+      } else if (it.kind === 'toggle' && it.action === 'theme') {
+        if (window.__toggleTheme) window.__toggleTheme();
+      } else if (it.kind === 'copy') {
+        if (window.__copy) window.__copy(it.text).then((ok) => window.__toast && window.__toast(ok ? 'Email address copied' : 'Copy failed'));
       } else if (it.kind === 'toggle' && it.action === 'reduce-motion') {
         const on = document.documentElement.getAttribute('data-reduce-motion') !== 'true';
         document.documentElement.setAttribute('data-reduce-motion', String(on));
@@ -398,16 +372,7 @@ const items: PaletteItem[] = [
     let chordPending = false;
     let chordTimer = 0;
 
-    const NAV_TARGETS = {
-      h: '#__top',
-      a: '#about',
-      e: '#experience',
-      s: '#skills',
-      p: '#projects',
-      d: '#education',
-      f: '#faq',
-      c: '#contact',
-    };
+    const NAV_TARGETS = Object.assign({ h: '#__top' }, chords);
 
     window.addEventListener('keydown', (e) => {
       const t = e.target;

@@ -1,51 +1,147 @@
-@import '@fontsource-variable/inter';
-@import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource-variable/archivo/wdth.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Instrument Faceplate: one matte panel on a desk. Tokens are RGB triplets so
+ * Tailwind can apply alpha. Light is the lead theme; dark is the same
+ * instrument in anodised graphite. Every text pair is WCAG AA.
+ */
 @layer base {
   :root {
+    color-scheme: light;
+    --desk: 220 220 215;        /* #DCDCD7 */
+    --plate: 237 237 233;       /* #EDEDE9 */
+    --raised: 249 249 247;      /* #F9F9F7 */
+    --sunk: 225 226 220;        /* #E1E2DC */
+    --seam: 207 208 202;        /* #CFD0CA */
+    --seam-hi: 255 255 255;
+    --ink: 26 27 29;            /* #1A1B1D */
+    --ink-2: 69 72 77;          /* #45484D */
+    --ink-3: 94 97 102;         /* #5E6166 */
+    --key: 43 45 48;            /* dark keys #2B2D30 */
+    --key-legend: 241 241 238;
+    --accent: 238 90 18;        /* the one orange key #EE5A12 */
+    --accent-legend: 26 27 29;
+    --accent-text: 184 60 10;   /* #B83C0A, orange as text on plate */
+    --focus: 194 65 12;         /* #C2410C */
+    --led-off: 196 197 191;
+
+    --shadow-key: 0 1px 0 rgb(0 0 0 / 0.06), 0 2px 4px -1px rgb(0 0 0 / 0.12), inset 0 1px 0 rgb(255 255 255 / 0.9);
+    --shadow-key-down: 0 0 0 rgb(0 0 0 / 0), 0 1px 1px rgb(0 0 0 / 0.1), inset 0 1px 2px rgb(0 0 0 / 0.08);
+    --shadow-plate: 0 1px 2px rgb(0 0 0 / 0.06), 0 24px 48px -32px rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.85);
+    --shadow-well: inset 0 2px 3px rgb(0 0 0 / 0.12), inset 0 -1px 0 rgb(255 255 255 / 0.7);
+    --grille: 196 197 191;
+
+    --nav-h: 4.5rem;
+    --pad: clamp(1.25rem, 3.6vw, 3rem);
+  }
+
+  /* Warm graphite: the light plate's warmth carried into the dark, so the
+     orange key belongs to the panel instead of sitting on a cold blue-black.
+     Wells sit only a few steps below the plate, so they read as recesses,
+     not holes. */
+  :root[data-theme='dark'] {
     color-scheme: dark;
+    --desk: 16 15 14;           /* #100F0E */
+    --plate: 32 31 29;          /* #201F1D */
+    --raised: 46 45 42;         /* #2E2D2A */
+    --sunk: 26 25 23;           /* #1A1917 */
+    --seam: 12 11 10;
+    --seam-hi: 52 50 47;
+    --ink: 238 236 231;         /* #EEECE7 */
+    --ink-2: 188 184 176;       /* #BCB8B0 */
+    --ink-3: 161 157 149;       /* #A19D95 */
+    --key: 64 62 58;            /* #403E3A */
+    --key-legend: 238 236 231;
+    --accent: 242 97 29;        /* #F2611D */
+    --accent-legend: 26 25 23;
+    --accent-text: 255 138 71;  /* #FF8A47 */
+    --focus: 255 138 71;
+    --led-off: 72 69 64;
+
+    --shadow-key: 0 1px 0 rgb(0 0 0 / 0.45), 0 2px 5px -1px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 248 235 / 0.07);
+    --shadow-key-down: 0 0 0 rgb(0 0 0 / 0), 0 1px 1px rgb(0 0 0 / 0.45), inset 0 1px 2px rgb(0 0 0 / 0.35);
+    --shadow-plate: 0 1px 2px rgb(0 0 0 / 0.5), 0 24px 48px -28px rgb(0 0 0 / 0.75), inset 0 1px 0 rgb(255 248 235 / 0.06);
+    --shadow-well: inset 0 2px 3px rgb(0 0 0 / 0.4), inset 0 -1px 0 rgb(255 248 235 / 0.05);
+    --grille: 10 9 8;
   }
 
   html {
+    background-color: rgb(var(--desk));
+    color: rgb(var(--ink));
     scroll-behavior: smooth;
-    background-color: theme('colors.bg.base');
-    color: theme('colors.text.primary');
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: rgb(var(--ink-3) / 0.55) rgb(var(--desk));
   }
 
   body {
-    @apply font-sans antialiased min-h-screen;
-    background:
-      radial-gradient(1200px 600px at 80% -10%, rgba(34, 211, 238, 0.07), transparent 60%),
-      radial-gradient(900px 500px at -10% 110%, rgba(168, 85, 247, 0.05), transparent 60%),
-      theme('colors.bg.base');
+    @apply font-sans antialiased;
+    min-height: 100vh;
+    background-color: rgb(var(--desk));
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    font-stretch: 100%;
+    font-feature-settings: 'ss01' 0;
+    caret-color: rgb(var(--accent));
+  }
+
+  /* Theme crossfade, only while the switch is being thrown, never under reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    html.theme-switching:not([data-reduce-motion='true']),
+    html.theme-switching:not([data-reduce-motion='true']) * {
+      transition: background-color 220ms cubic-bezier(0.16, 1, 0.3, 1), color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
   }
 
   ::selection {
-    background-color: rgba(34, 211, 238, 0.25);
-    color: theme('colors.text.primary');
+    background-color: rgb(var(--ink) / 0.16);
+    color: rgb(var(--ink));
   }
 
-  /* Anchored sections shouldn't hide under the sticky navbar. */
-  section[id] {
-    scroll-margin-top: 5rem;
+  :focus-visible {
+    outline: 3px solid rgb(var(--focus));
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+
+  [id] {
+    scroll-margin-top: calc(var(--nav-h) + 1.5rem);
+  }
+
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  p, li, dd {
+    text-wrap: pretty;
+  }
+
+  ::-webkit-scrollbar { width: 12px; height: 12px; }
+  ::-webkit-scrollbar-track { background: rgb(var(--desk)); }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--ink-3) / 0.45);
+    border: 3px solid rgb(var(--desk));
+    border-radius: 8px;
   }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
     }
   }
 
-  /* Manual reduce-motion toggle (set by the command palette). */
   html[data-reduce-motion='true'] { scroll-behavior: auto; }
   html[data-reduce-motion='true'] *,
   html[data-reduce-motion='true'] *::before,
@@ -56,20 +152,180 @@
   }
 }
 
-@layer utilities {
-  .text-gradient-accent {
-    background-image: linear-gradient(120deg, #67e8f9 0%, #22d3ee 40%, #a855f7 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+@layer components {
+  /* The one object: a matte faceplate set on the desk. */
+  .plate {
+    --plate-m: clamp(0.5rem, 1.6vw, 1.5rem);
+    position: relative;
+    width: min(82rem, calc(100% - 2 * var(--plate-m)));
+    margin: var(--plate-m) auto;
+    background: rgb(var(--plate));
+    border-radius: clamp(1.25rem, 2.2vw, 1.75rem);
+    box-shadow: var(--shadow-plate);
   }
 
-  .hero-grid-bg {
-    background-image:
-      linear-gradient(rgba(34, 211, 238, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(34, 211, 238, 0.06) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 80%);
-    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 80%);
+  /* Engraved seam: a dark cut with a highlight under it. */
+  .seam {
+    height: 0;
+    border: 0;
+    border-top: 1px solid rgb(var(--seam));
+    box-shadow: 0 1px 0 rgb(var(--seam-hi));
+  }
+
+  .module {
+    padding: clamp(3rem, 6vw, 5.5rem) var(--pad);
+    border-top: 1px solid rgb(var(--seam));
+    box-shadow: inset 0 1px 0 rgb(var(--seam-hi));
+  }
+
+  /* Engraved panel label: condensed caps, never a kicker over a heading. */
+  .engraved {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    font-weight: 620;
+    font-stretch: 78%;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgb(var(--ink-3));
+  }
+
+  .h-section {
+    font-size: clamp(2rem, 3.4vw, 3rem);
+    line-height: 1.02;
+    font-weight: 720;
+    font-stretch: 104%;
+    letter-spacing: -0.028em;
+    color: rgb(var(--ink));
+  }
+
+  .figure {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+  }
+
+  /* Raised key. Every key is a real link or button. */
+  .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.625rem 1rem;
+    border-radius: 0.75rem;
+    background: rgb(var(--raised));
+    color: rgb(var(--ink));
+    box-shadow: var(--shadow-key);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 120ms ease;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .key:hover { background: rgb(var(--raised) / 0.7); }
+  .key:active,
+  .key[aria-pressed='true'] {
+    transform: translateY(1px);
+    box-shadow: var(--shadow-key-down);
+  }
+  .key-dark {
+    background: rgb(var(--key));
+    color: rgb(var(--key-legend));
+  }
+  .key-dark:hover { background: rgb(var(--key) / 0.88); }
+  .key-accent {
+    background: rgb(var(--accent));
+    color: rgb(var(--accent-legend));
+  }
+  .key-accent:hover { background: rgb(var(--accent) / 0.9); }
+  .key svg { flex-shrink: 0; }
+
+  /* Recessed readout well. */
+  .well {
+    background: rgb(var(--sunk));
+    border-radius: 0.875rem;
+    box-shadow: var(--shadow-well);
+  }
+
+  /* Indicator LED. Lit only for "now": current status, current role, a lit cross-ref. */
+  .led {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: rgb(var(--led-off));
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.18);
+    flex-shrink: 0;
+  }
+  .led-on {
+    background: rgb(var(--accent));
+    box-shadow: inset 0 -1px 1px rgb(0 0 0 / 0.18), inset 0 1px 1px rgb(255 255 255 / 0.45);
+  }
+
+  /* Inline text link inside prose. */
+  .prose-link {
+    color: rgb(var(--ink));
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--ink-3));
+    text-decoration-thickness: 2px;
+  }
+  .prose-link:hover { text-decoration-color: rgb(var(--ink)); }
+
+  /* Vertical engraved cut between a row's label column and its body.
+     Set --cut to the column edge + half the gap. Applied at md / lg. */
+  .cut-md, .cut-lg { --cut: 14.25rem; }
+  @media (min-width: 768px) {
+    .cut-md {
+      background-image: linear-gradient(90deg,
+        transparent calc(var(--cut) - 1px), rgb(var(--seam)) calc(var(--cut) - 1px),
+        rgb(var(--seam)) var(--cut), rgb(var(--seam-hi)) var(--cut),
+        rgb(var(--seam-hi)) calc(var(--cut) + 1px), transparent calc(var(--cut) + 1px));
+    }
+  }
+  @media (min-width: 1024px) {
+    .cut-lg {
+      background-image: linear-gradient(90deg,
+        transparent calc(var(--cut) - 1px), rgb(var(--seam)) calc(var(--cut) - 1px),
+        rgb(var(--seam)) var(--cut), rgb(var(--seam-hi)) var(--cut),
+        rgb(var(--seam-hi)) calc(var(--cut) + 1px), transparent calc(var(--cut) + 1px));
+    }
+  }
+
+  /* A tech tag lit by the skills spotlight: full ink, engraved underline. */
+  .tags li.is-lit {
+    color: rgb(var(--ink));
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+
+  /* Justified prose blocks. Ragged on phones, where justification opens
+     rivers; never auto-hyphenated, so words are never split. */
+  @media (min-width: 640px) {
+    .justify {
+      text-align: justify;
+      text-justify: inter-word;
+      hyphens: manual;
+    }
+  }
+
+  /* Tech labels: engraved, separated, not pills. */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.875rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .tags li {
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-stretch: 82%;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgb(var(--ink-3));
   }
 }

@@ -1,0 +1,54 @@
+---
+/**
+ * Section heading with a copy-link key that appears on hover/focus.
+ * Clicking copies https://architgupta.me/#id (handled in BaseLayout).
+ */
+import Icon from '~/components/Icon.astro';
+
+interface Props {
+  id: string;
+  text: string;
+  as?: 'h1' | 'h2';
+}
+
+const { id, text, as: Tag = 'h2' } = Astro.props;
+---
+
+<div class="sh">
+  <Tag id={`${id}-title`} class="h-section">{text}</Tag>
+  <a
+    href={`#${id}`}
+    class="sh-copy"
+    data-anchor-copy
+    data-anchor-target={id}
+    aria-label={`Copy link to ${text}`}
+  >
+    <Icon name="link" size={16} />
+  </a>
+</div>
+
+<style>
+  .sh {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .sh-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    color: rgb(var(--ink-3));
+    opacity: 0;
+    transition: opacity 160ms ease, color 160ms ease, background-color 160ms ease;
+  }
+  .sh:hover .sh-copy,
+  .sh-copy:focus-visible { opacity: 1; }
+  .sh-copy:hover { color: rgb(var(--ink)); background: rgb(var(--sunk)); }
+  .sh-copy:global(.copied) { color: rgb(var(--ink)); background: rgb(var(--sunk)); opacity: 1; }
+  @media (hover: none) {
+    .sh-copy { opacity: 0.6; }
+  }
+</style>

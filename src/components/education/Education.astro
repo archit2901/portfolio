@@ -1,270 +1,110 @@
 ---
-import { site } from '~/content/site';
-import AnchorLink from '~/components/AnchorLink.astro';
+import { education } from '~/data/education';
+import { sectionById } from '~/data/sections';
+import SectionHeading from '~/components/SectionHeading.astro';
 
-const { education } = site;
-
-/**
- * Per-school accent → Tailwind class mapping. Mirrors the Experience pattern
- * so the JIT compiler picks all classes up.
- */
-const ACCENT_BAR: Record<string, string> = {
-  cyan:   'from-cyan-400/0 via-cyan-300/80 to-cyan-400/0',
-  amber:  'from-amber-400/0 via-amber-300/80 to-amber-400/0',
-  rose:   'from-rose-400/0 via-rose-300/80 to-rose-400/0',
-  violet: 'from-violet-400/0 via-fuchsia-300/80 to-violet-400/0',
-};
-const ACCENT_BORDER: Record<string, string> = {
-  cyan:   'hover:border-cyan-400/50 hover:shadow-[0_8px_24px_-14px_rgba(34,211,238,0.45)]',
-  amber:  'hover:border-amber-400/50 hover:shadow-[0_8px_24px_-14px_rgba(251,191,36,0.45)]',
-  rose:   'hover:border-rose-400/50 hover:shadow-[0_8px_24px_-14px_rgba(244,63,94,0.45)]',
-  violet: 'hover:border-violet-400/50 hover:shadow-[0_8px_24px_-14px_rgba(168,85,247,0.45)]',
-};
-const ACCENT_TEXT: Record<string, string> = {
-  cyan:   'text-cyan-300',
-  amber:  'text-amber-300',
-  rose:   'text-rose-300',
-  violet: 'text-violet-300',
-};
-
-const totalSchools = education.schools.length;
-const pad2 = (n: number) => String(n).padStart(2, '0');
+const s = sectionById('education');
 ---
 
-<section
-  id="education"
-  data-visible="false"
-  class="education-section relative isolate overflow-hidden border-t border-border-subtle/40 px-5 sm:px-8 py-16 sm:py-24 md:py-32 mx-auto w-full max-w-container"
->
-  {/* Atmospheric backdrop (top-right blob — distinct from Experience's bottom-left) */}
-  <div class="edu-grid" aria-hidden="true"></div>
-  <div class="edu-blob" aria-hidden="true"></div>
+<section id={s.id} class="module" aria-labelledby={`${s.id}-title`}>
+  <SectionHeading id={s.id} text={s.heading} />
 
-  {/* Section label */}
-  <p
-    data-reveal="0"
-    class="reveal font-mono text-xs text-text-faint tracking-wider mb-4"
-  >
-    <span class="text-accent/80">{education.sectionLabel.split('·')[0].trim()}</span>
-    <span class="mx-1.5 text-text-faint/70">·</span>
-    <span>{education.sectionLabel.split('·')[1]?.trim() ?? 'Education'}</span>
-  </p>
-
-  {/* Display heading + animated underline */}
-  <h2
-    data-reveal="1"
-    class="reveal text-text-primary font-semibold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]"
-  >
-    <span>{education.heading}</span>
-    <AnchorLink for="education" />
-  </h2>
-  <span data-reveal="2" class="reveal edu-underline" aria-hidden="true"></span>
-
-  {/* ── School cards ────────────────────────────────────────────── */}
-  <ul class="edu-row mt-10 md:mt-14 list-none p-0 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-    {
-      education.schools.map((s, i) => {
-        const accent = (s as any).accent ?? 'cyan';
-        return (
-          <li data-reveal={3 + i}>
-            <article
-              class={`edu-card relative h-full flex flex-col rounded-xl bg-bg-subtle/55 backdrop-blur-sm border border-border-subtle p-5 md:p-6 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 ${ACCENT_BORDER[accent]} overflow-hidden`}
-              data-magnet
-              data-accent={accent}
-              style="transform: translate(0,0);"
-            >
-              {/* Top accent bar */}
-              <span
-                class={`pointer-events-none absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${ACCENT_BAR[accent]}`}
-                aria-hidden="true"
-              ></span>
-
-              {/* Index badge */}
-              <span
-                class="absolute top-2.5 right-3 font-mono text-[9px] uppercase tracking-[0.18em] text-text-faint/70 select-none"
-                aria-hidden="true"
-              >
-                {pad2(i + 1)} / {pad2(totalSchools)}
-              </span>
-
-              {/* School name */}
-              <h3 class="pr-12 text-text-primary text-xl md:text-2xl font-semibold tracking-tight leading-tight">
-                {s.school}
-              </h3>
-
-              {/* Degree */}
-              <p class="mt-2 text-[15px] text-text-primary">
-                {s.degree}
-              </p>
-
-              {/* Department · Location */}
-              <p class="mt-1 text-[13px] text-text-muted">
-                {s.department && <span>{s.department}</span>}
-                {s.department && s.location && <span class="mx-1.5 text-text-faint/70">·</span>}
-                {s.location && <span>{s.location}</span>}
-              </p>
-
-              {/* Dates + GPA (one compact mono row) */}
-              <p class="mt-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-text-faint">
-                <span>{`${s.start} — ${s.end}`}</span>
-                {s.gpa && (
-                  <>
-                    <span class="mx-2 text-text-faint/60" aria-hidden="true">·</span>
-                    <span>
-                      GPA <span class={ACCENT_TEXT[accent]}>{s.gpa}</span>
-                    </span>
-                  </>
-                )}
-              </p>
-
-              {/* Separator */}
-              <span
-                class="block border-t border-border-subtle/60 mt-5 mb-4"
-                aria-hidden="true"
-              ></span>
-
-              {/* Coursework */}
-              {s.coursework.length > 0 && (
-                <div>
-                  <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint mb-2.5">
-                    Coursework
-                  </p>
-                  <ul class="flex flex-wrap gap-2 list-none p-0">
-                    {s.coursework.map((c) => (
-                      <li>
-                        <span
-                          title={c.title}
-                          class="inline-flex items-center px-2.5 py-1 rounded-md font-mono text-[12px] text-text-muted border border-border-subtle/80 bg-bg-subtle/40 hover:text-accent hover:border-accent/40 hover:bg-accent/[0.06] transition-colors cursor-help"
-                        >
-                          {c.code}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </article>
-          </li>
-        );
-      })
-    }
-  </ul>
+  <ol class="ed">
+    {education.map((e) => (
+      <li class="ed-row cut-md">
+        <div class="ed-meta">
+          <p class="ed-when figure">{e.start} – {e.end}</p>
+          <p class="ed-where">{e.location}</p>
+        </div>
+        <div class="ed-body">
+          <h3 class="ed-school">{e.school}</h3>
+          <p class="ed-degree">{e.degree}{e.department && <span class="ed-dept">{e.department}</span>}</p>
+          {e.gpa && (
+            <p class="ed-gpa well figure"><span class="engraved">GPA</span>{e.gpa}</p>
+          )}
+          <p class="engraved ed-cw-label">Coursework</p>
+          <ul class="ed-cw">
+            {e.coursework.map((c) => (
+              <li>{c.code && <span class="ed-code figure">{c.code}</span>}{c.title}</li>
+            ))}
+          </ul>
+        </div>
+      </li>
+    ))}
+  </ol>
 </section>
 
 <style>
-  /* ── Atmospheric backdrop (top-right; mirrors About direction) ── */
-  .edu-grid {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    background-image:
-      radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.10) 1px, transparent 0);
-    background-size: 28px 28px;
-    mask-image: radial-gradient(ellipse 80% 70% at 70% 40%, #000 25%, transparent 80%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 70% 40%, #000 25%, transparent 80%);
+  .ed {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
   }
-  .edu-blob {
-    position: absolute;
-    z-index: -1;
-    top: -120px;
-    right: -120px;
-    width: 540px;
-    height: 540px;
-    border-radius: 9999px;
-    background: conic-gradient(from 200deg, rgba(34,211,238,0.18), rgba(251,191,36,0.16), rgba(168,85,247,0.16), rgba(34,211,238,0.18));
-    filter: blur(60px);
-    opacity: 0.5;
-    pointer-events: none;
+  .ed-row {
+    display: grid;
+    gap: 0.75rem;
+    padding: 2rem 0;
+    border-top: 1px solid rgb(var(--seam));
+    box-shadow: inset 0 1px 0 rgb(var(--seam-hi));
+  }
+  .ed-row:last-child { padding-bottom: 0; }
+  .ed-meta p { margin: 0; }
+  .ed-when { font-weight: 640; font-size: 0.9375rem; }
+  .ed-where { margin-top: 0.125rem !important; font-size: 0.875rem; color: rgb(var(--ink-3)); }
+  .ed-school {
+    margin: 0;
+    font-size: clamp(1.375rem, 2vw, 1.625rem);
+    font-weight: 700;
+    letter-spacing: -0.018em;
+    line-height: 1.2;
+  }
+  .ed-degree {
+    margin: 0.25rem 0 0;
+    font-size: 1.0625rem;
+    font-weight: 540;
+    color: rgb(var(--ink-2));
+  }
+  .ed-dept { display: block; font-size: 0.9375rem; color: rgb(var(--ink-3)); }
+  .ed-gpa {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin: 1rem 0 0;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.625rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+  .ed-cw-label { margin: 1.5rem 0 0.5rem; }
+  .ed-cw {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-width: 48rem;
+  }
+  .ed-cw li {
+    display: flex;
+    gap: 0.875rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgb(var(--seam) / 0.7);
+    font-weight: 540;
+  }
+  .ed-code {
+    min-width: 4rem;
+    font-weight: 640;
+    font-size: 0.875rem;
+    color: rgb(var(--ink-3));
+    padding-top: 0.1em;
   }
 
-  /* ── Animated heading underline ──────────────────────────────── */
-  .edu-underline {
-    display: block;
-    margin-top: 18px;
-    height: 2px;
-    width: 0;
-    border-radius: 2px;
-    background: linear-gradient(90deg, #22d3ee, #a855f7);
-    transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;
-    will-change: width;
-  }
-  .education-section[data-visible='true'] .edu-underline { width: 120px; }
-
-  /* ── Scroll-in reveal sequence ───────────────────────────────── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(12px);
-    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
-                transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .education-section[data-visible='true'] .reveal { opacity: 1; transform: translateY(0); }
-  .education-section[data-visible='true'] .reveal[data-reveal='0'] { transition-delay:   0ms; }
-  .education-section[data-visible='true'] .reveal[data-reveal='1'] { transition-delay:  90ms; }
-  .education-section[data-visible='true'] .reveal[data-reveal='2'] { transition-delay: 160ms; }
-  .education-section[data-visible='true'] .reveal[data-reveal='3'] { transition-delay: 280ms; }
-  .education-section[data-visible='true'] .reveal[data-reveal='4'] { transition-delay: 360ms; }
-
-  /* ── Reduced motion gates ────────────────────────────────────── */
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    .edu-underline { width: 120px; transition: none; }
+  @media (min-width: 768px) {
+    .ed-row {
+      grid-template-columns: 13rem minmax(0, 1fr);
+      gap: 2.5rem;
+      padding: 2.5rem 0;
+    }
+    .ed-cw { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; }
   }
 </style>
-
-<script>
-  const section = document.querySelector<HTMLElement>('section#education.education-section');
-  if (section) {
-    // Section reveal toggle
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            (e.target as HTMLElement).dataset.visible = 'true';
-            io.unobserve(e.target);
-          }
-        }
-      },
-      { rootMargin: '0px 0px -15% 0px', threshold: 0.1 }
-    );
-    io.observe(section);
-
-    // ── Scroll parallax on backdrop (grid + blob, opposing) ────────
-    const grid = section.querySelector<HTMLElement>('.edu-grid');
-    const blob = section.querySelector<HTMLElement>('.edu-blob');
-    const parallaxOk = matchMedia('(prefers-reduced-motion: no-preference)').matches;
-    if ((grid || blob) && parallaxOk) {
-      let parallaxRaf = 0;
-      const onParallax = () => {
-        cancelAnimationFrame(parallaxRaf);
-        parallaxRaf = requestAnimationFrame(() => {
-          const rect = section.getBoundingClientRect();
-          const vh = window.innerHeight || 1;
-          const progress = (vh - rect.top) / (vh + rect.height);
-          const clamped = Math.max(-0.5, Math.min(1.5, progress));
-          if (grid) grid.style.transform = `translateY(${(-clamped * 40).toFixed(1)}px)`;
-          if (blob) blob.style.transform = `translateY(${(clamped * 25).toFixed(1)}px)`;
-        });
-      };
-      window.addEventListener('scroll', onParallax, { passive: true });
-      onParallax();
-    }
-
-    // Magnetic micro-tilt on each card
-    const MAG_STRENGTH = 0.06;
-    const MAG_MAX = 3;
-    section.querySelectorAll<HTMLElement>('[data-magnet]').forEach((card) => {
-      card.addEventListener('pointermove', (e) => {
-        if ((e as PointerEvent).pointerType !== 'mouse') return;
-        const rect = card.getBoundingClientRect();
-        const dx = (e.clientX - (rect.left + rect.width / 2)) * MAG_STRENGTH;
-        const dy = (e.clientY - (rect.top + rect.height / 2)) * MAG_STRENGTH;
-        const cx = Math.max(-MAG_MAX, Math.min(MAG_MAX, dx));
-        const cy = Math.max(-MAG_MAX, Math.min(MAG_MAX, dy));
-        card.style.transform = `translate(${cx}px, ${cy}px)`;
-      });
-      card.addEventListener('pointerleave', () => {
-        card.style.transform = 'translate(0, 0)';
-      });
-    });
-  }
-</script>

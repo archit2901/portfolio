@@ -28,7 +28,7 @@ I build web products and AI systems end to end: React front ends, cloud backends
 
 ### Recent projects
 
-- 📍 **[siteline](https://github.com/archit2901/siteline)**: built at HackPrinceton Fall 2026 (Business + Enterprise track). An AI agent that tells any business where in Houston to open its next location, scoring every H3 hexagon with a Huff model and ranking real CoStar lease spaces, with every number verified against its source.
+- 📍 **[siteline](https://github.com/archit2901/siteline)**: 2nd Place, CoStar Track, HackPrinceton 2026. A multi-agent system that tells any business where in Houston to open its next location, scoring every H3 hexagon with a Huff model and ranking real CoStar lease spaces, with every number verified against its source.
 - 📈 **SEC Filings Research Agent**: an agentic RAG system over NVIDIA, AMD, and Micron SEC filings (LangGraph, Pinecone, Cohere reranking). An early-stopping agent cut model calls by 43% and latency by half versus a baseline.
 - 🌊 **[market-stream](https://github.com/archit2901/market-stream)**: a real-time market data pipeline that merges CoinGecko and Finnhub into one deduplicated Kafka event stream, with event-time rolling windows in Redis.
 - 🔗 **[url-shortener](https://github.com/archit2901/url-shortener)**: production-grade URL shortener in Go + Postgres + Redis + Sentry. Cache-aside redirects, base62 short codes, CI workflow, testcontainers integration tests.

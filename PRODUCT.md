@@ -22,7 +22,7 @@ He builds web products and AI systems end to end: React front ends, cloud backen
 
 ## Operating Context
 
-- Visitors compare the site against the résumé PDF in the next tab, so content must match the résumé exactly.
+- Visitors compare the site against the résumé PDF in the next tab. The site may carry more than the one-page résumé (the Technical Support role, a third CATLR bullet, extra skills, the SEC Filings Agent), but it never contradicts it: every résumé number appears on the site exactly as written.
 - Recruiters skim; engineers dig. The first viewport serves the skim, everything below rewards digging.
 - Light and dark mode both required: follow the system setting by default, with a manual toggle.
 
@@ -31,7 +31,7 @@ He builds web products and AI systems end to end: React front ends, cloud backen
 - Static Astro 5 site, Tailwind 3, deployed on Vercel from `main`. Client JS only where interaction needs it.
 - URLs that must keep working: `/`, `/projects`, `/resume.pdf`, section anchors (`#about`, `#experience`, `#projects`, `#contact`, ...), plus `/uses`, `/blog`, and vanity redirects in `vercel.json`.
 - Content lives in typed data files under `src/data/`; components never hardcode copy.
-- Required features: ⌘K command palette, copy-to-clipboard email, résumé download, "Code I'm proud of" (URL shortener `Resolve` snippet), static impact-stats row, section numbering if it fits.
+- Required features: ⌘K command palette, copy-to-clipboard email, résumé download, skills spotlight (press a skill to see every bullet and project that used it), static impact-stats row, section numbering if it fits.
 - Experience shows 3 to 4 bullets per role without clicks; only extra bullets collapse.
 - Lighthouse 95+ for Performance, Accessibility, Best Practices, SEO on mobile and desktop. Responsive at 375, 768, 1280+.
 - Calm motion only; `prefers-reduced-motion` turns non-essential animation off.

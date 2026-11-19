@@ -35,11 +35,12 @@ export const projects: Project[] = [
   {
     slug: "siteline",
     name: "Siteline",
-    tagline: "An AI agent that tells any business where in Houston to open its next location.",
-    event: "HackPrinceton Fall 2026 · Business + Enterprise track",
+    subtitle: "AI Site-Selection Agents",
+    tagline: "A multi-agent system that tells any business where in Houston to open its next location.",
+    event: "2nd Place · CoStar Track · HackPrinceton 2026",
     description:
-      "The owner describes the business. An agent works out its customers and competitors, finds public data to measure each factor, and asks the owner to approve the data plan and weights. Python then scores every H3 hexagon across Harris, Fort Bend and Montgomery counties, estimates customers won with a Huff model, and ranks real CoStar lease spaces by customers won and rent per customer. A critic recomputes every number against its source before the top 10 are shown with citations.",
-    stack: ["Python", "FastAPI", "LangGraph", "Amazon Bedrock", "React", "deck.gl"],
+      "Led a 4-person team building a multi-agent site-selection system on Amazon Bedrock and LangChain. It scores 11,720 H3 hexagons across Harris, Fort Bend and Montgomery counties with a Huff gravity model, ranks real CoStar lease spaces by customers won and rent per customer, and verifies every number in Python (40/40 evals) before the top 10 are shown with citations.",
+    stack: ["Python", "FastAPI", "LangChain", "Amazon Bedrock", "React", "deck.gl"],
     repoUrl: "https://github.com/archit2901/siteline",
     year: "2026",
     category: "ai",
